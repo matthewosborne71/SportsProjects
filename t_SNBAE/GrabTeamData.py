@@ -27,8 +27,13 @@ Columns = ['TEAM_ID','TEAM_NAME','GAME_ID','GAME_DATE','PLAYER_ID','PLAYER_NAME'
 
 First = True
 
+# For each season
 for Season in Seasons:
+    # For each team
     for ID in TeamIDs:
+        # We'll grab the shot chart data for the team, extract the relevant
+        # columns from the dataframe, then append the most recently retrieved
+        # data onto the running dataframe.
         if First:
             First = False
             NBAShots_DF = shotchartdetail.ShotChartDetail(team_id = ID,
@@ -45,8 +50,11 @@ for Season in Seasons:
             NBAShots_DF = pd.concat([NBAShots_DF,Temp_DF])
             del Temp_DF
 
+        # To help us keep track of progress, the rest is to make sure we
+        # aren't scraping too quickly
         print("Resting 5 seconds.")
         time.sleep(5)
     print("Finished for " + str(Season) + " season.")
 
+# Write the data to file 
 NBAShots_DF.to_csv("NBAShots_2013_2019.csv", index = False)
