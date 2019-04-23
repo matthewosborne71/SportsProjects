@@ -40,7 +40,7 @@ for Season in Seasons:
                             player_id = 0,
                             season_nullable = Season,
                             context_measure_simple = 'FGA')
-            NBAShots_DF = [df for df in NBAShots.get_data_frames() if df['GRID_TYPE'][0] == 'Shot Chart Detail'][0][Columns]
+            NBAShots_DF = [df for df in NBAShots.get_data_frames() if df['GRID_TYPE'][0] == 'Shot Chart Detail'][0][Columns].copy()
             NBAShots_DF['Season'] = Season
             del NBAShots
         else:
@@ -48,7 +48,7 @@ for Season in Seasons:
                             player_id = 0,
                             season_nullable = Season,
                             context_measure_simple = 'FGA')
-            Temp_DF = [df for df in Temp.get_data_frames() if df['GRID_TYPE'][0] == 'Shot Chart Detail'][0][Columns]
+            Temp_DF = [df for df in Temp.get_data_frames() if df['GRID_TYPE'][0] == 'Shot Chart Detail'][0][Columns].copy()
             Temp_DF['Season'] = Season
             NBAShots_DF = pd.concat([NBAShots_DF,Temp_DF])
             del Temp_DF
