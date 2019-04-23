@@ -36,19 +36,23 @@ for Season in Seasons:
         # data onto the running dataframe.
         if First:
             First = False
-            NBAShots_DF = shotchartdetail.ShotChartDetail(team_id = ID,
+            NBAShots = shotchartdetail.ShotChartDetail(team_id = ID,
                             player_id = 0,
                             season_nullable = Season,
-                            context_measure_simple = 'FGA').get_data_frames()[1][Columns]
+                            context_measure_simple = 'FGA')
+            NBAShots_DF = [df for df in NBAShots.get_data_frames() if df['GRID_TYPE'][0] == 'Shot Chart Detail'][0][Columns]
             NBAShots_DF['Season'] = Season
+            del NBAShots
         else:
-            Temp_DF = shotchartdetail.ShotChartDetail(team_id = ID,
+            Temp = shotchartdetail.ShotChartDetail(team_id = ID,
                             player_id = 0,
                             season_nullable = Season,
-                            context_measure_simple = 'FGA').get_data_frames()[1][Columns]
+                            context_measure_simple = 'FGA')
+            Temp_DF = [df for df in Temp.get_data_frames() if df['GRID_TYPE'][0] == 'Shot Chart Detail'][0][Columns]
             Temp_DF['Season'] = Season
             NBAShots_DF = pd.concat([NBAShots_DF,Temp_DF])
             del Temp_DF
+            del Temp
 
         # To help us keep track of progress, the rest is to make sure we
         # aren't scraping too quickly
@@ -56,5 +60,5 @@ for Season in Seasons:
         time.sleep(5)
     print("Finished for " + str(Season) + " season.")
 
-# Write the data to file 
+# Write the data to file
 NBAShots_DF.to_csv("NBAShots_2013_2019.csv", index = False)
