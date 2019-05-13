@@ -1,8 +1,6 @@
 *.pyc
 .ipynb_checkpoints
 *.txt
-NBAShots_2013_2019.csv
-Team_Shots_by_Zone.csv
-ZONE_KEY.csv
+*.csv
 FGA_By_SHOT_ZONE_AREA.png
 FGA_By_SHOT_ZONE_BASIC.png
