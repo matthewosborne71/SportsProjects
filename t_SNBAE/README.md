@@ -14,6 +14,12 @@ This code will take the csv file that results from GrabTeamData.py and classifie
  <ul>
  <li>TEAM_NAME - The team's name,</li>
  <li>Season - The season,</li>
- <li>ZONE_i_PERC_OF_TOTAL_SHOTS - The percentage of the team's total shots that occurred in ZONE_i,</li>
- <li>ZONE_i_PERC_MADE - Of the shots that occurred in ZONE_i, the percentage that the team made.</li>
+ <li>ZONE_PERC_TOT - The percentage of the team's total shots that occurred in ZONE,</li>
+ <li>ZONE_PERC_MADE - Of the shots that occurred in ZONE_i, the percentage that the team made.</li>
+ <li>3_PERC_OF_TOT - What percent of the team's total shots were from 3,</li>
+ <li>MID_PERC_OF_TOT - What percent of the team's total shots were from the mid range,</li>
+ <li>CLOSE_PERC_OF_TOT - What percent of the team's total shots were from the paint.</li>
  </ul>
+ 
+ #### PCA.py
+ This code takes in the csv Team_Shots_by_Zone.csv that is output by OrganizeTeamData.py. It then takes only the PERC_TOT columns and runs that through a PCA. It will output a new csv file that records the component vectors from the pca, and alter Team_Shots_by_Zone.csv to include the first and second coordinates from the PCA projection. These are labeled pca_1 and pca_2. These are added for plotting purposes.
