@@ -1,7 +1,7 @@
 import pandas as pd
 
 # Load in the data we pulled with GrabTeamData.py
-shots = pd.read_csv("NBAShots_2013_2019.csv")
+shots = pd.read_csv(path + "NBAShots_2013_2019.csv")
 
 # Add a ZONE_DETAIL variable
 shots['ZONE_DETAIL'] = shots[['SHOT_ZONE_BASIC','SHOT_ZONE_AREA']].apply(lambda x: ','.join(x), axis = 1)
@@ -85,7 +85,7 @@ for season in seasons:
         columns_wanted.extend([col + '_PERC_OF_TOTAL_SHOTS', col + '_PERC_MADE'])
 
     player_shots_by_zone = player_shots_by_zone[columns_wanted]
-    player_shots_by_zone.to_csv("player_shots_by_zone_" + season + ".csv")
+    player_shots_by_zone.to_csv(path + "player_shots_by_zone_" + season + ".csv")
 
     player_shots_by_zone = None
     season_shots = None

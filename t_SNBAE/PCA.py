@@ -3,9 +3,12 @@ import pandas as pd
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 import numpy as np
+import Path
+
+path = Path.get_path()
 
 # Read in the aggregated shot data
-team_by_zone = pd.read_csv("Team_Shots_by_Zone.csv")
+team_by_zone = pd.read_csv(path + "Team_Shots_by_Zone.csv")
 
 # Only grab the perc of total data
 variables = [c for c in team_by_zone.columns if '_PERC_TOT' in c]
@@ -27,7 +30,7 @@ for i in range(len(variables)):
     components['component_' + str(i+1)] = pca.components_[i,:]
 
 # Save components data fram to csv
-components.to_csv("team_pca_components.csv", index = False)
+components.to_csv(path + "team_pca_components.csv", index = False)
 
 # Project the points to the hyperplane
 fit = pca.transform(X)
@@ -37,4 +40,4 @@ team_by_zone['pca_1'] = fit[:,0]
 team_by_zone['pca_2'] = fit[:,1]
 
 # Update Team_Shots_by_Zone.csv to include pca components
-team_by_zone.to_csv("Team_Shots_by_Zone.csv", index = False)
+team_by_zone.to_csv(path + "Team_Shots_by_Zone.csv", index = False)

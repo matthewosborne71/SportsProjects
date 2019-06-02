@@ -61,4 +61,4 @@ for Season in Seasons:
     print("Finished for " + str(Season) + " season.")
 
 # Write the data to file
-NBAShots_DF.to_csv("NBAShots_2013_2019.csv", index = False)
+NBAShots_DF.to_csv(path + "NBAShots_2013_2019.csv", index = False)

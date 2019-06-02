@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load in the data we pulled with GrabTeamData.py
-TeamShots = pd.read_csv("NBAShots_2013_2019.csv")
+TeamShots = pd.read_csv(path + "NBAShots_2013_2019.csv")
 
 # Add a new variable that combines the two shot zone variables into one
 TeamShots['ZONE_DETAIL'] = TeamShots[['SHOT_ZONE_BASIC','SHOT_ZONE_AREA']].apply(lambda x: '-'.join(x).replace(" ", "_"), axis = 1)
@@ -89,4 +89,4 @@ SHOTS_BY_ZONE['CLOSE_PERC_OF_TOT'] = SHOTS_BY_ZONE[col_close].sum(axis = 1)
 
 
 
-SHOTS_BY_ZONE.to_csv("Team_Shots_by_Zone.csv")
+SHOTS_BY_ZONE.to_csv(path + "Team_Shots_by_Zone.csv")
