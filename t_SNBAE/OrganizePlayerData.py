@@ -1,4 +1,7 @@
 import pandas as pd
+import Path
+
+path = Path.get_path()
 
 # Load in the data we pulled with GrabTeamData.py
 shots = pd.read_csv(path + "NBAShots_2013_2019.csv")

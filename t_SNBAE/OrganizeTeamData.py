@@ -1,6 +1,9 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import Path
+
+path = Path.get_path()
 
 # Load in the data we pulled with GrabTeamData.py
 TeamShots = pd.read_csv(path + "NBAShots_2013_2019.csv")
@@ -23,7 +26,7 @@ colors = [cm(i) for i in range(n_zones)]
 
 # plot the x-y coordinates of each shot and color by ZONE_DETAIL
 sns.lmplot(data = TeamShots, x = 'LOC_X', y = 'LOC_Y', hue = 'ZONE_DETAIL',
-            palette = colors, fit_reg = False, scatter_kws = {'s':2})
+            palette = colors, fit_reg = False, scatter_kws = {'s':5})
 plt.savefig("ZONE_DETAIL_Court_Location.png")
 plt.close()
 
