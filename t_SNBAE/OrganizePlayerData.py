@@ -7,34 +7,17 @@ path = Path.get_path()
 shots = pd.read_csv(path + "NBAShots_2013_2019.csv")
 
 # Add a ZONE_DETAIL variable
-shots['ZONE_DETAIL'] = shots[['SHOT_ZONE_BASIC','SHOT_ZONE_AREA']].apply(lambda x: ','.join(x), axis = 1)
+shots['ZONE_DETAIL'] = shots[['SHOT_ZONE_BASIC','SHOT_ZONE_AREA']].apply(lambda x: '-'.join(x).replace(" ", "_"), axis = 1)
 # Combine both Backcourt zones into one
-shots.loc[shots.ZONE_DETAIL == 'Backcourt,Back Court(BC)','ZONE_DETAIL'] = 'Backcourt'
-shots.loc[shots.ZONE_DETAIL == 'Above the Break 3,Back Court(BC)','ZONE_DETAIL'] = 'Backcourt'
+shots.loc[shots.ZONE_DETAIL == 'Backcourt-Back_Court(BC)','ZONE_DETAIL'] = 'Backcourt'
+shots.loc[shots.ZONE_DETAIL == 'Above_the_Break_3-Back_Court(BC)','ZONE_DETAIL'] = 'Backcourt'
 shots = shots[['PLAYER_NAME','Season','ZONE_DETAIL','SHOT_MADE_FLAG']]
 
 # Make Dummies
 dummies = pd.get_dummies(shots['ZONE_DETAIL'])
 
-# # Helps us know which zone is coded as ZONE_i, i = 0,...,15
-zone_key = {}
 
-# Helps with aesthetic so that zones are arranged in numerical order
-def sort_key(x):
-    if len(x) == 6:
-        return int(x[5])
-    else:
-        return int(x[5:])
-
-# Renaming the dummies with the numerical qualifiers we've created
-i = 0
-for col in dummies.columns:
-    zone_key[col] = 'ZONE_' + str(i)
-    i = i + 1
-
-dummies = dummies.rename(columns = zone_key)
 columns = list(dummies.columns)
-columns.sort(key = sort_key)
 
 # Add the dummies to shots df
 for col in columns:
@@ -80,12 +63,12 @@ for season in seasons:
         player_shots_by_zone[col + '_MADE'] = season_shots.loc[season_shots[col] == 1,].groupby(['PLAYER_NAME']).sum()['SHOT_MADE_FLAG']
 
         # Percent of shots taken that where in that zone
-        player_shots_by_zone[col + '_PERC_OF_TOTAL_SHOTS'] = player_shots_by_zone[col + '_ATT']/player_shots_by_zone['TOTAL_SHOTS']
+        player_shots_by_zone[col + '_PERC_TOT'] = player_shots_by_zone[col + '_ATT']/player_shots_by_zone['TOTAL_SHOTS']
         # Percent of shots made in that zones
         player_shots_by_zone[col + '_PERC_MADE'] = player_shots_by_zone[col + '_MADE']/player_shots_by_zone[col + '_ATT']
 
         # What columns do we want
-        columns_wanted.extend([col + '_PERC_OF_TOTAL_SHOTS', col + '_PERC_MADE'])
+        columns_wanted.extend([col + '_PERC_TOT', col + '_PERC_MADE'])
 
     player_shots_by_zone = player_shots_by_zone[columns_wanted]
     player_shots_by_zone.to_csv(path + "player_shots_by_zone_" + season + ".csv")

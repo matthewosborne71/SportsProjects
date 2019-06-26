@@ -3,10 +3,11 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import Path
 
+# Get the path where I'm storing data
 path = Path.get_path()
 
 # Load in the data we pulled with GrabTeamData.py
-TeamShots = pd.read_csv(path + "NBAShots_2013_2019.csv")
+TeamShots = pd.read_csv(path + "NBAShots_2000_2019.csv")
 
 # Add a new variable that combines the two shot zone variables into one
 TeamShots['ZONE_DETAIL'] = TeamShots[['SHOT_ZONE_BASIC','SHOT_ZONE_AREA']].apply(lambda x: '-'.join(x).replace(" ", "_"), axis = 1)
@@ -31,7 +32,7 @@ plt.savefig("ZONE_DETAIL_Court_Location.png")
 plt.close()
 
 # Isolate just the team, season, ZONE_DETAIL, and make/miss
-Shot_by_Zone = TeamShots[['TEAM_NAME','Season','ZONE_DETAIL','SHOT_MADE_FLAG']].copy()
+Shot_by_Zone = TeamShots[['TEAM_NAME','TEAM_ID','Season','ZONE_DETAIL','SHOT_MADE_FLAG']].copy()
 
 # Create Dummy Variables
 Dummies = pd.get_dummies(Shot_by_Zone['ZONE_DETAIL'])
@@ -47,17 +48,18 @@ for col in Columns:
 
 del Dummies
 
+# Initialize a list we'll use later
 Columns_Wanted = []
 
 # How many total shots were taken by each team in each season
-SHOTS_BY_ZONE = Shot_by_Zone.groupby(['TEAM_NAME','Season']).size().to_frame('TOTAL_SHOTS')
+SHOTS_BY_ZONE = Shot_by_Zone.groupby(['TEAM_ID','TEAM_NAME','Season']).size().to_frame('TOTAL_SHOTS')
 
 # For each of the zones
 for col in Columns:
     # How many shots were attempted in that zone for each team in each season
-    SHOTS_BY_ZONE[col + '_ATT'] = Shot_by_Zone.groupby(['TEAM_NAME','Season']).sum()[col]
+    SHOTS_BY_ZONE[col + '_ATT'] = Shot_by_Zone.groupby(['TEAM_ID','TEAM_NAME','Season']).sum()[col]
     # How many shots were made in that zone for each team in each season
-    SHOTS_BY_ZONE[col + '_MADE'] = Shot_by_Zone.loc[Shot_by_Zone[col] == 1,].groupby(['TEAM_NAME','Season']).sum()['SHOT_MADE_FLAG']
+    SHOTS_BY_ZONE[col + '_MADE'] = Shot_by_Zone.loc[Shot_by_Zone[col] == 1,].groupby(['TEAM_ID','TEAM_NAME','Season']).sum()['SHOT_MADE_FLAG']
 
     # Now calculate what percentage of a teams shots were in that zone
     SHOTS_BY_ZONE[col + '_PERC_TOT'] = SHOTS_BY_ZONE[col + '_ATT']/SHOTS_BY_ZONE['TOTAL_SHOTS']
@@ -91,5 +93,5 @@ SHOTS_BY_ZONE['MID_PERC_OF_TOT'] = SHOTS_BY_ZONE[col_mid].sum(axis = 1)
 SHOTS_BY_ZONE['CLOSE_PERC_OF_TOT'] = SHOTS_BY_ZONE[col_close].sum(axis = 1)
 
 
-
+# Save csv to file
 SHOTS_BY_ZONE.to_csv(path + "Team_Shots_by_Zone.csv")

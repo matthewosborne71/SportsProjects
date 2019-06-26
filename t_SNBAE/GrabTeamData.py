@@ -6,18 +6,23 @@
 # import the packages we will need #
 # Data Handling
 import pandas as pd
+import Path
 
 # nba scraper
 from nba_api.stats.static import teams
 from nba_api.stats.endpoints import shotchartdetail
 import time
 
+# Get the path
+path = Path.get_path()
+
 # Get the NBA teams
 Teams = teams.get_teams()
 TeamIDs = [team['id'] for team in Teams]
+print([team['full_name'] for team in Teams])
 
-# We'll pull data on the last five seasons
-Seasons = [str(year) + "-" + str(year + 1)[2:4] for year in range(2013,2019,1)]
+# We'll pull data on since 2000
+Seasons = [str(year) + "-" + str(year + 1)[2:4] for year in range(2000,2019,1)]
 
 # Data we'll want
 Columns = ['TEAM_ID','TEAM_NAME','GAME_ID','GAME_DATE','PLAYER_ID','PLAYER_NAME',
@@ -40,25 +45,30 @@ for Season in Seasons:
                             player_id = 0,
                             season_nullable = Season,
                             context_measure_simple = 'FGA')
-            NBAShots_DF = [df for df in NBAShots.get_data_frames() if df['GRID_TYPE'][0] == 'Shot Chart Detail'][0][Columns].copy()
-            NBAShots_DF['Season'] = Season
-            del NBAShots
+            if len(NBAShots.get_data_frames()[0]) != 0:
+                NBAShots_DF = [df for df in NBAShots.get_data_frames() if df['GRID_TYPE'][0] == 'Shot Chart Detail'][0][Columns].copy()
+                NBAShots_DF['Season'] = Season
+                del NBAShots
+            else:
+                First = True
         else:
             Temp = shotchartdetail.ShotChartDetail(team_id = ID,
                             player_id = 0,
                             season_nullable = Season,
                             context_measure_simple = 'FGA')
-            Temp_DF = [df for df in Temp.get_data_frames() if df['GRID_TYPE'][0] == 'Shot Chart Detail'][0][Columns].copy()
-            Temp_DF['Season'] = Season
-            NBAShots_DF = pd.concat([NBAShots_DF,Temp_DF])
-            del Temp_DF
-            del Temp
+            if len(Temp.get_data_frames()[0]) != 0:
+                Temp_DF = [df for df in Temp.get_data_frames() if df['GRID_TYPE'][0] == 'Shot Chart Detail'][0][Columns].copy()
+                Temp_DF['Season'] = Season
+                NBAShots_DF = pd.concat([NBAShots_DF,Temp_DF])
+                del Temp_DF
+                del Temp
 
         # To help us keep track of progress, the rest is to make sure we
         # aren't scraping too quickly
         print("Resting 5 seconds.")
-        time.sleep(5)
+        #time.sleep(5)
     print("Finished for " + str(Season) + " season.")
 
 # Write the data to file
-NBAShots_DF.to_csv(path + "NBAShots_2013_2019.csv", index = False)
+# Note this is a largish csv file
+NBAShots_DF.to_csv(path + "NBAShots_2000_2019.csv", index = False)
