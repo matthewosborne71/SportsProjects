@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+
+<!-- The point of this file is to write up my findings on PCA and NBA team shot distributions -->
+<!-- Written by Matthew Osborne -->
+
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>
+            Working Title
+        </title>
+        <script src="https://d3js.org/d3.v5.min.js"></script>
+        <style type="text/css">
+            #pca:hover {
+                fill: red;
+            }
+
+            .line {
+                fill: none;
+                stroke: black;
+                stroke-width: 3;
+            }
+		</style>
+    </head>
+    <body>
+        <h2 id="title">
+            Working Title
+        </h2>
+        <h4 id="author">
+            Matthew Osborne
+        </h4>
+
+
+        <!--This holds the main plot--->
+        <div id = "main-holder" style = "width:1300px; height:800px; margin:auto; float:left;">
+            <div id = "main-plot" style = "width:1000px; height:750px; float:left;">
+            </div>
+            <div id = "side-text" style = "width:300px; height:400px; float:right;">
+                <div id = "buttons" style = "width:300px; height:50px; float:top;">
+                    <p>Highlighted Season: <span id = "season-button"></span> <br>
+                        Highlighted Team: <span id = "team-button"></span>
+                    </p>
+                </div>
+                <div id = "text" style = "width:300px; height:350px; float:bottom;">
+                    <p style = "font-size:125%"><strong>Season: </strong> <span id = "Season" style= "color:white;"></span>
+                    <br>
+                    <strong>Team: </strong> <span id = "Team" style = "color:white;"></span><br>
+                    <span style = "font-size:90%">
+                    Shots in the Paint: <span id = "paint"></span> <br>
+                    Shots from Midrange: <span id = "midrange"></span> <br>
+                    Shots from 3: <span id = "three"></span></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!--This holds the time lapse plot--->
+        <div id = "time-holder" style = "width:1000px; height:700px; margin:auto; float:left;">
+            <div id = "time-lapse-plot" style = "width:900px; height:750px; float:left;">
+            </div>
+            <div id = "time-side" style = "width:100px; height 650px; float:right;">
+                <div id = "time-button" style = "width:100px; height 650px; position: relative; top:60px; left: -100px;">
+                    <button type="button" style = "font-size:16px; padding: 5px 2px;">Start!</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- This holds the three plot --->
+        <div id = "three-div", style = "width:900px; height:650px; margin:auto; float:left;">
+            <div id = "three-plot" style = "width:800px; height:650px; margin:auto; float:left;">
+            </div>
+            <div id = "three-legend" style = "width:100px; height:650px; margin:auto; float:left;">
+            </div>
+        </div>
+
+        <!-- This holds the close plot --->
+        <div id = "close-div", style = "width:900px; height:650px; margin:auto; float:left;">
+            <div id = "close-plot" style = "width:800px; height:650px; margin:auto; float:left;">
+            </div>
+            <div id = "close-legend" style = "width:100px; height:650px; margin:auto; float:left;">
+            </div>
+        </div>
+
+        <!-- This holds the efficiency plot --->
+        <div id = "eff-div", style = "width:900px; height:650px; margin:auto; float:left;">
+            <div id = "eff-plot" style = "width:800px; height:650px; margin:auto; float:left;">
+            </div>
+            <div id = "eff-legend" style = "width:100px; height:650px; margin:auto; float:left;">
+            </div>
+        </div>
+
+        <!--Rockets Plot div--->
+        <div id = "rockets-div", style = "width:800 px; height: 600px; margin: auto; float:left;">
+            <div id = "rockets-plot" style = "width: 800px; height: 600px; margin: auto; float: left;">
+            </div>
+        </div>
+
+
+
+        <!--Bucks Plot div--->
+        <div id = "bucks-div", style = "width:800 px; height: 600px; margin: auto; float:left;">
+            <div id = "bucks-plot" style = "width: 800px; height: 600px; margin: auto; float: left;">
+            </div>
+        </div>
+
+        <!--Nets Plot div--->
+        <div id = "nets-div", style = "width:800 px; height: 600px; margin: auto; float:left;">
+            <div id = "nets-plot" style = "width: 800px; height: 600px; margin: auto; float: left;">
+            </div>
+        </div>
+
+        <!--Warriors Plot div--->
+        <div id = "warriors-div", style = "width:1100 px; height: 600px; margin: auto; float:left;">
+            <div id = "warriors-plot" style = "width: 800px; height: 600px; margin: auto; float: left;">
+            </div>
+            <div id = "warriors-side" style = "width: 300px; height: 600px; margin: auto; float: right;">
+              <div id = "warriors-button-div" style = "margin: auto; position: relative; top:50px; left: -50px;">
+                <button id="warriors-button" style = "font-size:16px; padding: 5px 2px;">Start!</button>
+
+                <p style = "font-size:125%"><b>Teams Right of The Warriors</b> <br> <br>
+                  2014-15: <span id = "fourteen"></span> <br>
+                  2015-16: <span id = "fifteen"></span> <br>
+                  2016-17: <span id = "sixteen"></span> <br>
+                  2017-18: <span id = "seventeen"></span> <br>
+                  2018-19: <span id = "eighteen"></span>
+                </p>
+
+              </div>
+            </div>
+        </div>
+
+
+        <!--Makes all of the plots--->
+		<script type="text/javascript">
+            /* Main Plot */
+            // Variables for the main plot
+            var main_width = 1000
+            var main_height = 750
+            var padding = 50
+
+            // svg for the main plot
+            var svg = d3.select("#main-plot")
+                            .append("svg")
+                            .attr("width", main_width)
+                            .attr("height", main_height);
+
+            /* Time Lapse Plot */
+            // Variables for the time lapse plot
+            var time_width = 800
+            var time_height = 650
+
+            // svg for the time lapse plot
+            var time_svg = d3.select("#time-lapse-plot")
+                                .append("svg")
+                                .attr("width",time_width)
+                                .attr("height",time_height);
+
+            time_svg.append("text")
+                        .attr("x",70)
+                        .attr("y",85)
+                        .attr("font-size","24px")
+                        .attr("id","season-text")
+                        .text("Season:");
+
+            /* Three Plot */
+            var three_width = 700
+            var three_height = 550
+            var three_legend_svg_width = 100
+            var three_legend_svg_height = 550
+            var three_legend_width = 30
+            var three_legend_height = 500
+
+
+            var three_svg = d3.select("#three-plot")
+                                .append("svg")
+                                .attr("width",three_width)
+                                .attr("height",three_height);
+
+            var three_legend_svg = d3.select("#three-legend")
+                                        .append("svg")
+                                        .attr("width", three_legend_svg_width)
+                                        .attr("height", three_legend_svg_height);
+
+            /* Close Plot */
+            var close_width = 700
+            var close_height = 550
+            var close_legend_svg_width = 100
+            var close_legend_svg_height = 550
+            var close_legend_width = 30
+            var close_legend_height = 500
+
+            var close_svg = d3.select("#close-plot")
+                                .append("svg")
+                                .attr("width",close_width)
+                                .attr("height",close_height);
+
+            var close_legend_svg = d3.select("#close-legend")
+                                        .append("svg")
+                                        .attr("width", close_legend_svg_width)
+                                        .attr("height", close_legend_svg_height);
+
+
+            /* Efficiency Plot */
+            var eff_width = 700
+            var eff_height = 550
+            var eff_legend_svg_width = 100
+            var eff_legend_svg_height = 550
+            var eff_legend_width = 30
+            var eff_legend_height = 500
+
+            var eff_svg = d3.select("#eff-plot")
+                                .append("svg")
+                                .attr("width",close_width)
+                                .attr("height",close_height);
+
+            var eff_legend_svg = d3.select("#eff-legend")
+                                        .append("svg")
+                                        .attr("width", close_legend_svg_width)
+                                        .attr("height", close_legend_svg_height);
+
+
+
+
+            var buffer = .01
+
+            // d3 for the plots
+            d3.csv("Data/Team_Shots_by_Zone.csv").then(function(data){
+                /* First the main plot */
+                // xscale
+                var xScale = d3.scaleLinear()
+                                .domain([d3.min(data, function(d){return parseFloat(d.pca_1);}) - buffer, d3.max(data, function(d){return parseFloat(d.pca_1);}) + buffer])
+                                .range([padding, main_width - padding]);
+
+                // yscale
+                var yScale = d3.scaleLinear()
+                                .domain([d3.min(data, function(d){return parseFloat(d.pca_2);}) - buffer, d3.max(data, function(d){return parseFloat(d.pca_2);}) + buffer])
+                                .range([main_height - padding, padding]);
+
+                // make axes
+                var xAxis = d3.axisBottom(xScale);
+
+                var yAxis = d3.axisLeft(yScale);
+
+
+                // This function draws the pca values for each team
+                var drawCircles = function(){
+                    var circles = svg.selectAll("circle")
+                                    .data(data)
+                                    .enter()
+                                    .append("circle");
+
+                    circles.attr("cx", function(d){
+                                return xScale(parseFloat(d.pca_1));
+                            })
+                            .attr("cy", function(d){
+                                return yScale(parseFloat(d.pca_2));
+                            })
+                            .attr("r", 5)
+                            .attr("fill","black")
+                            .attr("stroke","black")
+                            .attr("stroke-width",2)
+                            .attr("id","pca")
+                            .attr("opacity",.8)
+                            .on("mouseover", function(d){
+                                    d3.select("#Team")
+                                        .style("color", "black")
+                                        .text(d.TEAM_NAME);
+
+                                    d3.select("#Season")
+                                        .style("color", "black")
+                                        .text(d.Season);
+
+                                    d3.select("#paint")
+                                        .style("color", "black")
+                                        .text(function(){
+                                            var perc = parseFloat(d['CLOSE_PERC_OF_TOT'])
+
+                                            perc = 100 * perc
+
+                                            perc = perc.toFixed(2).toString()
+
+                                            return perc.concat("%")
+                                        });
+
+                                    d3.select("#midrange")
+                                        .style("color", "black")
+                                        .text(function(){
+                                            var perc = parseFloat(d['MID_PERC_OF_TOT'])
+
+                                            perc = 100 * perc
+
+                                            perc = perc.toFixed(2).toString()
+
+                                            return perc.concat("%")
+                                        });
+
+                                    d3.select("#three")
+                                        .style("color", "black")
+                                        .text(function(){
+                                            var perc = parseFloat(d['3_PERC_OF_TOT'])
+
+                                            perc = 100 * perc
+
+                                            perc = perc.toFixed(2).toString()
+
+                                            return perc.concat("%")
+                                        });
+                            })
+                            .on("mouseout", function(d){
+                                    d3.select("#Team")
+                                        .style("color", "white")
+                                        .text("");
+
+                                    d3.select("#Season")
+                                        .style("color","white")
+                                        .text("");
+
+                                    d3.select("#paint")
+                                        .style("color","white")
+                                        .text("");
+
+                                    d3.select("#midrange")
+                                        .style("color","white")
+                                        .text("");
+
+                                    d3.select("#three")
+                                        .style("color","white")
+                                        .text("");
+                            });
+                }
+
+                // This function updates the circles when we slect season/team
+                var updateCircles = function(){
+                    var season_sel = document.getElementById('season-sel');
+                    var team_sel = document.getElementById('team-sel');
+
+                    var season = season_sel.options[season_sel.selectedIndex].value;
+                    var team_id = team_sel.options[team_sel.selectedIndex].value;
+
+                    if (season === "All"){
+                        if (team_id === "All"){
+                            svg.selectAll("circle")
+                                .data(data)
+                                .transition()
+                                .attr("opacity",.8)
+                                .duration(2000);
+                        } else{
+                            svg.selectAll("circle")
+                                .data(data)
+                                .filter(function(d){return d.TEAM_ID != team_id;})
+                                .transition("transition1")
+                                .attr("opacity",.05);
+
+                            svg.selectAll("circle")
+                                .data(data)
+                                .filter(function(d){return d.TEAM_ID === team_id;})
+                                .transition("transition2")
+                                .duration(1000)
+                                .attr("opacity",.9);
+                        }
+                    } else{
+                        if(team_id === "All"){
+                            svg.selectAll("circle")
+                                .data(data)
+                                .filter(function(d){return d.Season != season;} )
+                                .transition("transition1")
+                                .attr("opacity",.05);
+
+                            svg.selectAll("circle")
+                                .data(data)
+                                .filter(function(d){return d.Season === season;})
+                                .transition("transition2")
+                                .duration(1000)
+                                .attr("opacity", .9);
+                        } else{
+                            svg.selectAll("circle")
+                                .data(data)
+                                .filter(function(d){return (d.Season != season) || (d.TEAM_ID != team_id);} )
+                                .transition("transition1")
+                                .attr("opacity",.05);
+
+                            svg.selectAll("circle")
+                                .data(data)
+                                .filter(function(d){return (d.Season === season) && (d.TEAM_ID == team_id);})
+                                .transition("transition2")
+                                .duration(1000)
+                                .attr("opacity",.9);
+                        }
+                    }
+
+                }
+
+
+                // put in the season dropdown button
+                var seasonDropdown = d3.select("#season-button")
+                                        .insert("select", "svg")
+                                        .attr("id","season-sel")
+                                        .on("change", updateCircles);
+
+
+
+                seasonDropdown.selectAll("option")
+                                .data(d3.map(data, function(d){return d.Season;}).keys())
+                                .enter()
+                                .append("option")
+                                .text(function(d){return d;})
+                                .attr("value",function(d){return d;});
+
+                seasonDropdown.append("option")
+                                .text("All")
+                                .attr("value", "All")
+                                .property("selected","All");
+
+                // put in the team dropdown
+                var teamDropdown = d3.select("#team-button")
+                                        .insert("select","svg")
+                                        .attr("id","team-sel")
+                                        .on("change",updateCircles);
+
+                teamDropdown.selectAll("option")
+                                .data(data)
+                                .enter()
+                                .filter(function(d){return d.Season === "2018-19";})
+                                .append("option")
+                                .text(function(d){return d.TEAM_NAME;})
+                                .attr("value",function(d){return d.TEAM_ID;});
+
+                teamDropdown.append("option")
+                            .text("All")
+                            .attr("value","All")
+                            .property("selected","All");
+
+
+                // append the axes to the plot
+                svg.append("g")
+                    .attr("transform", "translate(0, " + (main_height - padding) +")")
+                    .call(xAxis);
+
+                svg.append("g")
+                    .attr("transform", "translate(" + padding + ",0)")
+                    .call(yAxis);
+
+                // draw the circles onto the svg
+                drawCircles();
+
+
+
+
+
+                /* time lapse plot */
+                // Make the x scale
+                var time_xScale = d3.scaleLinear()
+                                .domain([d3.min(data, function(d){return parseFloat(d.pca_1);}) - buffer, d3.max(data, function(d){return parseFloat(d.pca_1);}) + buffer])
+                                .range([padding, time_width - padding]);
+
+                // Make the y scale
+                var time_yScale = d3.scaleLinear()
+                                .domain([d3.min(data, function(d){return parseFloat(d.pca_2);}) - buffer, d3.max(data, function(d){return parseFloat(d.pca_2);}) + buffer])
+                                .range([time_height - padding, padding]);
+
+                // make the x axis
+                var time_xAxis = d3.axisBottom(time_xScale);
+
+                // make the y axis
+                var time_yAxis = d3.axisLeft(time_yScale);
+
+                // put on the x axis
+                time_svg.append("g")
+                    .attr("transform", "translate(0, " + (time_height - padding) +")")
+                    .call(time_xAxis);
+
+                // put on the y axis
+                time_svg.append("g")
+                    .attr("transform", "translate(" + padding + ",0)")
+                    .call(time_yAxis);
+
+                // This function runs through the season sequence
+                var seasonSequence = function(){
+                    var circles = time_svg.selectAll("circle")
+                                            .data(data)
+                                            .enter()
+                                            .append("circle");
+
+                    circles.attr("cx", function(d){
+                                return time_xScale(parseFloat(d.pca_1));
+                            })
+                            .attr("cy", function(d){
+                                return time_yScale(parseFloat(d.pca_2));
+                            })
+                            .attr("r", 5)
+                            .attr("fill","black")
+                            .attr("id","pca")
+                            .attr("opacity",.01);
+
+                   var seasons = d3.map(data, function(d){return d.Season;}).keys();
+
+                   var seasonsLength = seasons.length;
+
+                   for (var i = 0; i < seasonsLength; i++) {
+                       var delay = 1500;
+                       var dur = 200;
+
+                       time_svg.selectAll("#season-text")
+                                .transition("text")
+                                .delay(delay*i)
+                                .text("Season: " + seasons[i]);
+
+                       time_svg.selectAll("circle")
+                                    .data(data)
+                                    .filter(function(d){return d.Season != seasons[i];})
+                                    .transition("circles")
+                                    .delay( (delay*i) )
+                                    .attr("opacity",.01)
+                                    .duration(dur);
+
+                       time_svg.selectAll("circle")
+                                    .data(data)
+                                    .filter(function(d){return d.Season === seasons[i];})
+                                    .transition("circles")
+                                    .delay( (delay*i) )
+                                    .duration(dur)
+                                    .attr("opacity",.9);
+                    }
+                }
+
+                // this adds the on click function to the time-lapse button
+                d3.select("#time-button")
+                    .on("click",seasonSequence);
+
+                /* Three plot */
+                // Make the x scale
+                var three_xScale = d3.scaleLinear()
+                                .domain([d3.min(data, function(d){return parseFloat(d.pca_1);}) - buffer, d3.max(data, function(d){return parseFloat(d.pca_1);}) + buffer])
+                                .range([padding, three_width - padding]);
+
+                // Make the y scale
+                var three_yScale = d3.scaleLinear()
+                                .domain([d3.min(data, function(d){return parseFloat(d.pca_2);}) - buffer, d3.max(data, function(d){return parseFloat(d.pca_2);}) + buffer])
+                                .range([three_height - padding, padding]);
+
+                // make the x axis
+                var three_xAxis = d3.axisBottom(three_xScale);
+
+                // make the y axis
+                var three_yAxis = d3.axisLeft(three_yScale);
+
+                // put on the x axis
+                three_svg.append("g")
+                    .attr("transform", "translate(0, " + (three_height - padding) +")")
+                    .call(three_xAxis);
+
+                // put on the y axis
+                three_svg.append("g")
+                    .attr("transform", "translate(" + padding + ",0)")
+                    .call(three_yAxis);
+
+                /* Close Plot */
+                // Make the x scale
+                var close_xScale = d3.scaleLinear()
+                                .domain([d3.min(data, function(d){return parseFloat(d.pca_1);}) - buffer, d3.max(data, function(d){return parseFloat(d.pca_1);}) + buffer])
+                                .range([padding, close_width - padding]);
+
+                // Make the y scale
+                var close_yScale = d3.scaleLinear()
+                                .domain([d3.min(data, function(d){return parseFloat(d.pca_2);}) - buffer, d3.max(data, function(d){return parseFloat(d.pca_2);}) + buffer])
+                                .range([close_height - padding, padding]);
+
+                // make the x axis
+                var close_xAxis = d3.axisBottom(close_xScale);
+
+                // make the y axis
+                var close_yAxis = d3.axisLeft(close_yScale);
+
+                // put on the x axis
+                close_svg.append("g")
+                    .attr("transform", "translate(0, " + (close_height - padding) +")")
+                    .call(close_xAxis);
+
+                // put on the y axis
+                close_svg.append("g")
+                    .attr("transform", "translate(" + padding + ",0)")
+                    .call(close_yAxis);
+
+
+                /* Efficiency Plot */
+                var effPlot= function(){
+                    // Make the x scale
+                    var eff_xScale = d3.scaleLinear()
+                                    .domain([d3.min(data, function(d){return parseFloat(d.pca_1);}) - buffer, d3.max(data, function(d){return parseFloat(d.pca_1);}) + buffer])
+                                    .range([padding, eff_width - padding]);
+
+                    // Make the y scale
+                    var eff_yScale = d3.scaleLinear()
+                                    .domain([d3.min(data, function(d){return parseFloat(d.pca_2);}) - buffer, d3.max(data, function(d){return parseFloat(d.pca_2);}) + buffer])
+                                    .range([eff_height - padding, padding]);
+
+                    // make the x axis
+                    var eff_xAxis = d3.axisBottom(eff_xScale);
+
+                    // make the y axis
+                    var eff_yAxis = d3.axisLeft(eff_yScale);
+
+                    // put on the x axis
+                    eff_svg.append("g")
+                        .attr("transform", "translate(0, " + (eff_height - padding) +")")
+                        .call(eff_xAxis);
+
+                    // put on the y axis
+                    eff_svg.append("g")
+                        .attr("transform", "translate(" + padding + ",0)")
+                        .call(eff_yAxis);
+
+                    var color = d3.scaleSequential().domain([d3.min(data, function(d){return  parseFloat(d['Restricted_Area-Center(C)_PERC_TOT']) + parseFloat(d['3_PERC_OF_TOT']);}), d3.max(data, function(d){return parseFloat(d['Restricted_Area-Center(C)_PERC_TOT']) + parseFloat(d['3_PERC_OF_TOT']);})])
+                                        .interpolator(d3.interpolateInferno);
+
+                    var circles = eff_svg.selectAll("circle")
+                                            .data(data)
+                                            .enter()
+                                            .append("circle");
+
+                    circles.attr("cx", function(d){
+                                return three_xScale(parseFloat(d.pca_1));
+                            })
+                            .attr("cy", function(d){
+                                return three_yScale(parseFloat(d.pca_2));
+                            })
+                            .attr("r", 5)
+                            .attr("fill",function(d){return color(parseFloat(d['Restricted_Area-Center(C)_PERC_TOT']) + parseFloat(d['3_PERC_OF_TOT']));})
+                            .attr("stroke","black")
+                            .attr("stroke-width",1)
+                            .attr("opacity",.9);
+                }
+
+                var effLegend = function(){
+                    var colorScale = d3.scaleSequential(d3.interpolateInferno)
+                                        .domain([0, eff_legend_height])
+
+                    var bars = eff_legend_svg.selectAll("rect")
+                        .data(d3.range(eff_legend_height), function(d) { return d; })
+                        .enter()
+                        .append("rect")
+                        .attr("x", 0)
+                        .attr("y", function(d, i) { return eff_legend_height - i; })
+                        .attr("height", 1)
+                        .attr("width", eff_legend_width)
+                        .style("fill", function(d, i ) { return colorScale(d); })
+
+                    // yscale
+                    var yScale = d3.scaleLinear()
+                                    .domain([d3.min(data, function(d){return parseFloat(d['Restricted_Area-Center(C)_PERC_TOT'] + d['3_PERC_OF_TOT']);}), d3.max(data, function(d){return parseFloat(d['Restricted_Area-Center(C)_PERC_TOT'] + d['3_PERC_OF_TOT']);})])
+                                    .range([eff_legend_height, 0]);
+
+                    var yAxis = d3.axisRight(yScale);
+
+                    eff_legend_svg.append("g")
+                    .attr("transform", "translate(" + eff_legend_width + ",0)")
+                    .call(yAxis);
+
+
+                }
+
+                var percPlot = function(plot_svg, court_area){
+                    // make the color scale for the plot
+                    var color = d3.scaleSequential().domain([d3.min(data, function(d){return          parseFloat(d[court_area]);}), d3.max(data, function(d){return parseFloat(d[court_area]);})])
+                                    .interpolator(d3.interpolateInferno);
+
+                    var circles = plot_svg.selectAll("circle")
+                                            .data(data)
+                                            .enter()
+                                            .append("circle");
+
+                    circles.attr("cx", function(d){
+                                return three_xScale(parseFloat(d.pca_1));
+                            })
+                            .attr("cy", function(d){
+                                return three_yScale(parseFloat(d.pca_2));
+                            })
+                            .attr("r", 5)
+                            .attr("fill",function(d){return color(d[court_area]);})
+                            .attr("stroke","black")
+                            .attr("stroke-width",1)
+                            .attr("opacity",.9);
+
+                }
+
+                var addLegend = function(svg, court_area, height, width){
+                    var colorScale = d3.scaleSequential(d3.interpolateInferno)
+                                        .domain([0, height])
+
+                    var bars = svg.selectAll("rect")
+                        .data(d3.range(height), function(d) { return d; })
+                        .enter()
+                        .append("rect")
+                        .attr("x", 0)
+                        .attr("y", function(d, i) { return height - i; })
+                        .attr("height", 1)
+                        .attr("width", width)
+                        .style("fill", function(d, i ) { return colorScale(d); })
+
+                    // yscale
+                    var yScale = d3.scaleLinear()
+                                    .domain([d3.min(data, function(d){return parseFloat(d[court_area]);}), d3.max(data, function(d){return parseFloat(d[court_area]);})])
+                                    .range([height, 0]);
+
+                    var yAxis = d3.axisRight(yScale);
+
+                    svg.append("g")
+                    .attr("transform", "translate(" + width + ",0)")
+                    .call(yAxis);
+
+
+                }
+
+                percPlot(three_svg, "3_PERC_OF_TOT")
+                addLegend(three_legend_svg, "3_PERC_OF_TOT", three_legend_height, three_legend_width)
+
+
+                percPlot(close_svg, "Restricted_Area-Center(C)_PERC_TOT")
+                addLegend(close_legend_svg, "Restricted_Area-Center(C)_PERC_TOT", close_legend_height, close_legend_width)
+
+                effPlot()
+                effLegend()
+
+
+
+
+            });
+
+            d3.csv("Data/Houston.csv").then(function(data){
+                var seasons = d3.map(data, function(d){return d.Season;}).keys();
+                var width = 800;
+                var height = 600;
+                var padding = 75;
+                var buffer = .02;
+
+                var harden0 = data.find(item => item.Season === "2011-12")
+                var harden1 = data.find(item => item.Season === "2012-13")
+
+                var harden_pca1_diff = parseFloat(harden0.pca_1) - parseFloat(harden1.pca_1);
+                var harden_pca2_diff = parseFloat(harden0.pca_2) - parseFloat(harden1.pca_2);
+
+                var hardenHyp = hyp(harden_pca1_diff,harden_pca2_diff);
+
+                var dantoni0 = data.find(item => item.Season === "2015-16")
+                var dantoni1 = data.find(item => item.Season === "2016-17")
+
+                var dantoni_pca1_diff = parseFloat(dantoni0.pca_1) - parseFloat(dantoni1.pca_1);
+                var dantoni_pca2_diff = parseFloat(dantoni0.pca_2) - parseFloat(dantoni1.pca_2);
+
+                var dantoniHyp = hyp(dantoni_pca1_diff,dantoni_pca2_diff);
+
+
+                var svg = d3.select("#rockets-plot")
+                            .append("svg")
+                            .attr("width", width)
+                            .attr("height",height)
+                            .on("mouseover",mouseover)
+                            .on("mouseout",mouseout);
+
+
+                // Make x scale
+                var xScale = d3.scaleLinear()
+                                .domain([d3.min(data, function(d){return parseFloat(d.pca_1);}) - buffer, d3.max(data, function(d){return parseFloat(d.pca_1);}) + buffer])
+                                    .range([padding, width - padding]);
+
+                // Make y scale
+                var yScale = d3.scaleLinear()
+                                .domain([d3.min(data, function(d){return parseFloat(d.pca_2);}) - buffer, d3.max(data, function(d){return parseFloat(d.pca_2);}) + buffer])
+                                    .range([height - padding, padding]);
+
+                // Make x axis
+                var xAxis = d3.axisBottom(xScale);
+
+                // Make y axis
+                var yAxis = d3.axisLeft(yScale);
+
+
+
+
+
+                var hardenLine = svg.append("line")
+                                        .attr("x1",function() { return xScale(parseFloat(harden0.pca_1)); })
+                                        .attr("y1",function() { return yScale(parseFloat(harden0.pca_2)); })
+                                        .attr("x2",function() { return xScale(parseFloat(harden1.pca_1)); })
+                                        .attr("y2",function() { return yScale(parseFloat(harden1.pca_2)); })
+                                        .style("stroke","black")
+                                        .style("stroke-width",3)
+                                        .attr("opacity",0);
+
+                var hardenText = svg.append("text")
+                                        .attr("font-size",20)
+                                        .attr("fill","white")
+                                        .attr("x", -50)
+                                        .attr("y",-50)
+                                        .text("James Harden is traded to the Rockets");
+
+                var dantoniLine = svg.append("line")
+                                        .attr("x1",function() { return xScale(parseFloat(dantoni0.pca_1)); })
+                                        .attr("y1",function() { return yScale(parseFloat(dantoni0.pca_2)); })
+                                        .attr("x2",function() { return xScale(parseFloat(dantoni1.pca_1)); })
+                                        .attr("y2",function() { return yScale(parseFloat(dantoni1.pca_2)); })
+                                        .style("stroke","black")
+                                        .style("stroke-width",3)
+                                        .attr("opacity",0);
+
+                var dantoniText = svg.append("text")
+                                        .attr("font-size",20)
+                                        .attr("fill","white")
+                                        .attr("x",-50)
+                                        .attr("y",-60)
+                                        .text("Mike D'Antoni is hired");
+
+
+
+                var circles = svg.selectAll("circle")
+                    .data(data)
+                    .enter()
+                    .append("circle")
+                    .attr("cx",function(d){return xScale(parseFloat(d.pca_1));})
+                    .attr("cy",function(d){return yScale(parseFloat(d.pca_2));})
+                    .attr("Season",function(d){return d.Season;})
+                    .attr("r",7)
+                    .attr("id",function(d){return d.Season;})
+                    .attr("fill","#CE1141")
+                    .attr("stroke","#000000")
+                    .attr("stroke-width",3)
+                    .attr("opacity",1)
+                    .append("svg:title")
+                    .text(function(d) { return d.Season; });
+
+
+
+                function mouseover() {
+                    svg.selectAll("circle")
+                            .data(data)
+                            .filter(function(d){return (d.Season != "2011-12") &&
+                                                        (d.Season != "2012-13");})
+                            .transition("1")
+                            .duration(500)
+                            .attr("opacity",.05)
+
+
+                    hardenLine.transition("2")
+                                .delay(200)
+                                .attr("opacity",1);
+
+                    hardenLine.transition("3")
+                                .delay(600)
+                                .duration(1000)
+                                .attr("x2", function(){return xScale(parseFloat(harden0.pca_1) + hardenHyp);})
+                                .attr("y2", function(){return yScale(parseFloat(harden0.pca_2));})
+                                .transition("4")
+                                .delay(800)
+                                .duration(1000)
+                                .attr("y1", function(){return yScale(parseFloat(harden0.pca_2))+50;})
+                                .attr("y2", function(){return yScale(parseFloat(harden0.pca_2))+50;})
+                                .transition("7")
+                                .delay(3400)
+                                .duration(1000)
+                                .attr("x1",function() { return xScale(parseFloat(harden0.pca_1)); })
+                                .attr("y1",function() { return yScale(parseFloat(harden0.pca_2)); })
+                                .attr("x2",function() { return xScale(parseFloat(harden1.pca_1)); })
+                                .attr("y2",function() { return yScale(parseFloat(harden1.pca_2)); })
+                                .transition("9")
+                                .delay(500)
+                                .duration(500)
+                                .attr("opacity",.3);
+
+                    hardenText.transition("5")
+                                .delay(3000)
+                                .attr("x", function(){return xScale(parseFloat(harden0.pca_1));})
+                                .attr("y", function(){return yScale(parseFloat(harden0.pca_2))+40;})
+                                .transition("6")
+                                .attr("fill","black")
+                                .transition("8")
+                                .delay(3500)
+                                .attr("fill","white");
+
+                    svg.selectAll("circle")
+                            .data(data)
+                            .filter(function(d){return (d.Season === "2011-12") ||
+                                                        (d.Season === "2012-13");})
+                            .transition("10")
+                            .delay(8100)
+                            .duration(500)
+                            .attr("opacity",.3);
+
+                    svg.selectAll("circle")
+                            .data(data)
+                            .filter(function(d){return (d.Season === "2015-16") ||
+                                                (d.Season === "2016-17");})
+                            .transition("11")
+                            .delay(8600)
+                            .duration(500)
+                            .attr("opacity",1);
+
+                    dantoniLine.transition("12")
+                                .delay(8600)
+                                .attr("opacity",1);
+
+                    dantoniLine.transition("13")
+                                .delay(9100)
+                                .duration(1000)
+                                .attr("x2", function(){console.log(dantoni0.pca_1 + dantoniHyp)
+                                                       console.log(xScale(dantoni0.pca_1 + dantoniHyp))
+                                                        return xScale(parseFloat(dantoni0.pca_1) + dantoniHyp);})
+                                .attr("y2", function(){return yScale(parseFloat(dantoni0.pca_2));})
+                                .transition("14")
+                                .delay(800)
+                                .duration(1000)
+                                .attr("y1", function(){return yScale(dantoni0.pca_2) + 200;})
+                                .attr("y2", function(){return yScale(dantoni0.pca_2) + 200;})
+                                .transition("16")
+                                .delay(3400)
+                                .duration(1000)
+                                .attr("x1",function() { return xScale(parseFloat(dantoni0.pca_1)); })
+                                .attr("y1",function() { return yScale(parseFloat(dantoni0.pca_2)); })
+                                .attr("x2",function() { return xScale(parseFloat(dantoni1.pca_1)); })
+                                .attr("y2",function() { return yScale(parseFloat(dantoni1.pca_2)); });
+
+                    dantoniText.transition("15")
+                                .delay(12000)
+                                .attr("x", function(){return xScale(parseFloat(dantoni0.pca_1));})
+                                .attr("y", function(){return yScale(parseFloat(dantoni0.pca_2))+ 190;})
+                                .transition("6")
+                                .attr("fill","black")
+                                .transition("8")
+                                .delay(3300)
+                                .attr("fill","white");
+
+                    svg.selectAll("circle")
+                            .transition("16")
+                            .delay(17000)
+                            .duration(500)
+                            .attr("opacity",1);
+
+                    hardenLine.transition("17")
+                            .delay(17000)
+                            .duration(500)
+                            .attr("opacity",1);
+
+
+                }
+
+                function mouseout() {
+                    svg.selectAll("circle")
+                            .transition("1")
+                            .duration(500)
+                            .attr("opacity",1);
+
+                    hardenLine.transition("2")
+                                .attr("opacity",0);
+
+                    hardenLine.transition("3")
+                                .delay(500)
+                                .attr("x1", function(){return xScale(parseFloat(harden0.pca_1));})
+                                .attr("y1", function(){return yScale(parseFloat(harden0.pca_2));})
+                                .attr("x2", function(){return xScale(parseFloat(harden1.pca_1));})
+                                .attr("y2", function(){return yScale(parseFloat(harden1.pca_2));});
+
+
+
+
+
+                    dantoniLine.transition("4")
+                                .attr("opacity",0);
+
+                    dantoniLine.transition("5")
+                                .delay(500)
+                                .attr("x1", function(){return xScale(parseFloat(dantoni0.pca_1));})
+                                .attr("y1", function(){return yScale(parseFloat(dantoni0.pca_2));})
+                                .attr("x2", function(){return xScale(parseFloat(dantoni1.pca_1));})
+                                .attr("y2", function(){return yScale(parseFloat(dantoni1.pca_2));});
+
+                    hardenText.transition("6")
+                                .attr("fill","white")
+                                .transition("8")
+                                .delay(100)
+                                .attr("x",-50)
+                                .attr("y",-50);
+
+                    dantoniText.transition("7")
+                                .attr("fill","white")
+                                .transition("9")
+                                .delay(100)
+                                .attr("x",-50)
+                                .attr("y",-60);
+                }
+
+
+
+
+                // put on the x axis
+                svg.append("g")
+                    .attr("transform", "translate(0, " + (height - padding) +")")
+                    .call(xAxis);
+
+                // put on the y axis
+                svg.append("g")
+                    .attr("transform", "translate(" + padding + ",0)")
+                    .call(yAxis);
+
+
+
+
+
+
+
+
+            });
+
+            d3.csv("Data/Bucks.csv").then(function(data){
+                var width = 800;
+                var height = 600;
+                var padding = 75;
+                var buffer = .02;
+
+
+                var svg = d3.select("#bucks-plot")
+                            .append("svg")
+                            .attr("width", width)
+                            .attr("height",height);
+
+
+
+                // Make x scale
+                var xScale = d3.scaleLinear()
+                                .domain([d3.min(data, function(d){return parseFloat(d.pca_1);}) - buffer, d3.max(data, function(d){return parseFloat(d.pca_1);}) + buffer])
+                                    .range([padding, width - padding]);
+
+                // Make y scale
+                var yScale = d3.scaleLinear()
+                                .domain([d3.min(data, function(d){return parseFloat(d.pca_2);}) - buffer, d3.max(data, function(d){return parseFloat(d.pca_2);}) + buffer])
+                                    .range([height - padding, padding]);
+
+                // Make x axis
+                var xAxis = d3.axisBottom(xScale);
+
+                // Make y axis
+                var yAxis = d3.axisLeft(yScale);
+
+
+
+                svg.selectAll("circle")
+                    .data(data)
+                    .enter()
+                    .append("circle")
+                    .attr("cx",function(d){return xScale(parseFloat(d.pca_1));})
+                    .attr("cy",function(d){return yScale(parseFloat(d.pca_2));})
+                    .attr("r",6)
+                    .attr("fill","#EEE1C6")
+                    .attr("stroke","#00471B")
+                    .attr("stroke-width",4)
+                    .attr("opacity",.75)
+                    .append("svg:title")
+                    .text(function(d) { return d.Season; });
+
+
+
+                // put on the x axis
+                svg.append("g")
+                    .attr("transform", "translate(0, " + (height - padding) +")")
+                    .call(xAxis);
+
+                // put on the y axis
+                svg.append("g")
+                    .attr("transform", "translate(" + padding + ",0)")
+                    .call(yAxis);
+
+
+            });
+
+            d3.csv("Data/Nets.csv").then(function(data){
+                var width = 800;
+                var height = 600;
+                var padding = 75;
+                var buffer = .02;
+
+
+                var svg = d3.select("#nets-plot")
+                            .append("svg")
+                            .attr("width", width)
+                            .attr("height",height);
+
+
+
+                // Make x scale
+                var xScale = d3.scaleLinear()
+                                .domain([d3.min(data, function(d){return parseFloat(d.pca_1);}) - buffer, d3.max(data, function(d){return parseFloat(d.pca_1);}) + buffer])
+                                    .range([padding, width - padding]);
+
+                // Make y scale
+                var yScale = d3.scaleLinear()
+                                .domain([d3.min(data, function(d){return parseFloat(d.pca_2);}) - buffer, d3.max(data, function(d){return parseFloat(d.pca_2);}) + buffer])
+                                    .range([height - padding, padding]);
+
+                // Make x axis
+                var xAxis = d3.axisBottom(xScale);
+
+                // Make y axis
+                var yAxis = d3.axisLeft(yScale);
+
+
+
+                svg.selectAll("circle")
+                    .data(data)
+                    .enter()
+                    .append("circle")
+                    .attr("cx",function(d){return xScale(parseFloat(d.pca_1));})
+                    .attr("cy",function(d){return yScale(parseFloat(d.pca_2));})
+                    .attr("r",6)
+                    .attr("fill","#FFFFFF")
+                    .attr("stroke","#000000")
+                    .attr("stroke-width",4)
+                    .attr("opacity",.75)
+                    .append("svg:title")
+                    .text(function(d) { return d.Season; });
+
+
+
+                // put on the x axis
+                svg.append("g")
+                    .attr("transform", "translate(0, " + (height - padding) +")")
+                    .call(xAxis);
+
+                // put on the y axis
+                svg.append("g")
+                    .attr("transform", "translate(" + padding + ",0)")
+                    .call(yAxis);
+
+
+            });
+
+            d3.csv("Data/14_15_use.csv").then(function(data){
+                var width = 800;
+                var height = 600;
+                var padding = 75;
+                var buffer = .02;
+
+
+                var svg = d3.select("#warriors-plot")
+                            .append("svg")
+                            .attr("width", width)
+                            .attr("height",height);
+
+
+                // Make x scale
+                var xScale = d3.scaleLinear()
+                                .domain([d3.min(data, function(d){return parseFloat(d.pca_1);}) - buffer, d3.max(data, function(d){return parseFloat(d.pca_1);}) + buffer])
+                                    .range([padding, width - padding]);
+
+                // Make y scale
+                var yScale = d3.scaleLinear()
+                                .domain([d3.min(data, function(d){return parseFloat(d.pca_2);}) - buffer, d3.max(data, function(d){return parseFloat(d.pca_2);}) + buffer])
+                                    .range([height - padding, padding]);
+
+                // Make x axis
+                var xAxis = d3.axisBottom(xScale);
+
+                // Make y axis
+                var yAxis = d3.axisLeft(yScale);
+
+                // put on the x axis
+                svg.append("g")
+                    .attr("transform", "translate(0, " + (height - padding) +")")
+                    .call(xAxis);
+
+                // put on the y axis
+                svg.append("g")
+                    .attr("transform", "translate(" + padding + ",0)")
+                    .call(yAxis);
+
+                setPlot();
+
+                var button = d3.select("#warriors-button");
+
+                button.on("click",function(){
+                    button.removeEventListener("click");
+
+                    warriorsSequence();
+
+                    setTimeout(function() {
+                          button.setClickable(true);
+                    }, 31000);
+
+                });
+
+                d3.select("#warriors-button")
+                  .on("click",function(){
+                            d3.selectAll("circles")
+                              .interrupt();
+
+                            warriorsSequence();
+                      });
+
+
+
+
+
+
+
+
+                function setPlot(){
+                            svg.selectAll("circle")
+                                .data(data)
+                                .enter()
+                                .append("circle")
+                                .attr("cx",function(d){return xScale(parseFloat(d.pca_1));})
+                                .attr("cy",function(d){return yScale(parseFloat(d.pca_2));})
+                                .attr("r",6)
+                                .attr("stroke-width",4)
+                                .attr("stroke","black")
+                                .attr("fill","black")
+                                .attr("opacity",0)
+                                .filter(function(d){return d.TEAM_NAME === "Golden State Warriors";})
+                                .attr("fill","#FFC72C")
+                                .attr("stroke","#1D428A");
+
+                            svg.append("text")
+                                .attr("font-size","20")
+                                .attr("fill","black")
+                                .attr("x",100)
+                                .attr("y",100)
+                                .attr("id","note")
+                                .text("");
+
+                }
+
+
+
+                function warriorsSequence(){
+
+                    svg.selectAll("circle")
+                        .interrupt("gsw");
+
+                    svg.selectAll("circle")
+                        .interrupt("ngsw");
+
+                    svg.selectAll("#note")
+                        .interrupt("note");
+
+                    svg.selectAll("circle")
+                        .transition("start")
+                        .delay(0)
+                        .duration(0)
+                        .attr("opacity",0);
+
+                    var note = svg.selectAll("#note");
+
+
+
+                    svg.selectAll("circle")
+                        .data(data)
+                        .filter(function(d){return d.Season === "2014-15" &
+                                            d.TEAM_NAME === "Golden State Warriors";})
+                        .transition("gsw")
+                        .duration(500)
+                        .attr("opacity",1)
+                        .transition("gsw")
+                        .delay(5000)
+                        .duration(500)
+                        .attr("opacity",.5);
+
+                    svg.selectAll("circle")
+                        .data(data)
+                        .filter(function(d){return d.Season === "2014-15" &&
+                                                d.TEAM_NAME != "Golden State Warriors";})
+                        .transition("ngsw")
+                        .delay(2000)
+                        .duration(500)
+                        .attr("opacity",1)
+                        .transition("ngsw")
+                        .delay(3000)
+                        .duration(500)
+                        .attr("opacity",0);
+
+
+
+                    note.transition("note")
+                            .duration(500)
+                            .text("The Golden State Warriors Win the Title in 2014-15.")
+                            .transition("note")
+                            .delay(1600)
+                            .duration(0)
+                            .text("The rest of the NBA in 2014-15.")
+                            .transition("note")
+                            .delay(3500)
+                            .duration(0)
+                            .text("The Warriors lose to the Cavs in 2015-16.")
+                            .transition("note")
+                            .delay(2000)
+                            .text("The rest of the NBA in 2015-16")
+                            .transition("note")
+                            .delay(2500)
+                            .text("Durant goes to the Warriors, they win in 2016-17")
+                            .transition("note")
+                            .delay(2000)
+                            .text("The rest of the NBA in 2016-17")
+                            .transition("note")
+                            .delay(2500)
+                            .text("Warriors repeat in 2017-18")
+                            .transition("note")
+                            .delay(2000)
+                            .text("The rest of the NBA in 2017-18")
+                            .transition("note")
+                            .delay(3000)
+                            .text("The Warriors lose to Toronto in 2018-19")
+                            .transition("note")
+                            .delay(2000)
+                            .text("The rest of the NBA in 2018-19")
+                            .transition("note")
+                            .delay(3000)
+                            .text("");
+
+                   svg.selectAll("circle")
+                        .data(data)
+                        .filter(function(d){return d.Season === "2015-16" &&
+                                                d.TEAM_NAME === "Golden State Warriors";})
+                        .transition("gsw")
+                        .delay(5500)
+                        .duration(500)
+                        .attr("opacity",1)
+                        .transition("gsw")
+                        .delay(4000)
+                        .duration(500)
+                        .attr("opacity",.5);
+
+                    svg.selectAll("circle")
+                        .data(data)
+                        .filter(function(d){return d.Season === "2015-16" &&
+                                                d.TEAM_NAME != "Golden State Warriors";})
+                        .transition("ngsw")
+                        .delay(7500)
+                        .duration(500)
+                        .attr("opacity",1)
+                        .transition("ngsw")
+                        .delay(2000)
+                        .duration(500)
+                        .attr("opacity",0);
+
+                    svg.selectAll("circle")
+                        .data(data)
+                        .filter(function(d){return d.Season === "2016-17" &&
+                                                d.TEAM_NAME === "Golden State Warriors";})
+                        .transition("gsw")
+                        .delay(10000)
+                        .duration(800)
+                        .attr("opacity",1)
+                        .transition("gsw")
+                        .delay(3600)
+                        .duration(800)
+                        .attr("opacity",.5);
+
+                    svg.selectAll("circle")
+                        .data(data)
+                        .filter(function(d){return d.Season === "2016-17" &&
+                                                    d.TEAM_NAME != "Golden State Warriors";})
+                        .transition("ngsw")
+                        .delay(12000)
+                        .duration(800)
+                        .attr("opacity",1)
+                        .transition("ngsw")
+                        .delay(1500)
+                        .duration(800)
+                        .attr("opacity",0);
+
+                    svg.selectAll("circle")
+                        .data(data)
+                        .filter(function(d){return d.Season === "2017-18" &&
+                                                    d.TEAM_NAME === "Golden State Warriors";})
+                        .transition("gsw")
+                        .delay(14500)
+                        .duration(800)
+                        .attr("opacity",1)
+                        .transition("gsw")
+                        .delay(4000)
+                        .duration(800)
+                        .attr("opacity",.5);
+
+                    svg.selectAll("circle")
+                        .data(data)
+                        .filter(function(d){return d.Season === "2017-18" &&
+                                                    d.TEAM_NAME != "Golden State Warriors";})
+                        .transition("ngsw")
+                        .delay(16500)
+                        .duration(800)
+                        .attr("opacity",1)
+                        .transition("ngsw")
+                        .delay(2000)
+                        .duration(800)
+                        .attr("opacity",0);
+
+                    svg.selectAll("circle")
+                        .data(data)
+                        .filter(function(d){return d.Season === "2018-19" &&
+                                                    d.TEAM_NAME === "Golden State Warriors";})
+                        .transition("gsw")
+                        .delay(19500)
+                        .duration(800)
+                        .attr("opacity",1);
+
+                    svg.selectAll("circle")
+                        .data(data)
+                        .filter(function(d){return d.Season === "2018-19" &&
+                                                    d.TEAM_NAME != "Golden State Warriors";})
+                        .transition("ngsw")
+                        .delay(21500)
+                        .duration(800)
+                        .attr("opacity",1)
+                        .transition("ngsw")
+                        .delay(2000)
+                        .duration(800)
+                        .attr("opacity",0);
+
+                    svg.selectAll("circle")
+                        .data(data)
+                        .filter(function(d){return d.TEAM_NAME === "Golden State Warriors";})
+                        .transition("gsw")
+                        .delay(25000)
+                        .duration(1000)
+                        .attr("opacity",1);
+
+                    svg.selectAll("circle")
+                        .data(data)
+                        .filter(function(d){return d.TEAM_NAME != "Golden State Warriors";})
+                        .transition("ngsw")
+                        .delay(28000)
+                        .duration(1000)
+                        .attr("opacity",1);
+
+                    d3.csv("Data/num_teams_warriors.csv").then(function(data){
+
+                      d3.select("#fourteen")
+                          .transition("num_teams")
+                          .delay(2300)
+                          .text(data[0].NumTeams);
+
+
+                      d3.select("#fifteen")
+                          .transition("num_teams")
+                          .delay(7800)
+                          .text(data[1].NumTeams);
+
+                      d3.select("#sixteen")
+                          .transition("num_teams")
+                          .delay(12300)
+                          .text(data[2].NumTeams);
+
+                    d3.select("#seventeen")
+                          .transition("num_teams")
+                          .delay(16900)
+                          .text(data[3].NumTeams);
+
+                    d3.select("#eighteen")
+                          .transition("num_teams")
+                          .delay(21900)
+                          .text(data[4].NumTeams);
+
+
+
+
+
+
+                    })
+
+
+
+
+                };
+
+
+            });
+
+
+
+            function linspace(start, end, n) {
+                var out = [];
+                var delta = (end - start) / (n - 1);
+
+                var i = 0;
+                while(i < (n - 1)) {
+                    out.push(start + (i * delta));
+                    i++;
+                }
+
+                out.push(end);
+                return out;
+            }
+
+            function hyp(a,b) {
+                return Math.sqrt(a*a + b*b)
+            }
+
+        </script>
+
+
+    </body>
+</html>
