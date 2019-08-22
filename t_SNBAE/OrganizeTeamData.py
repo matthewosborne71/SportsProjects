@@ -21,13 +21,13 @@ TeamShots.loc[TeamShots.ZONE_DETAIL == 'Above_the_Break_3-Back_Court(BC)','ZONE_
 # are on the court
 
 # get the colors to paint each zone
-cm = plt.get_cmap('tab20')
+cm = plt.get_cmap('tab20b')
 n_zones = len(set(TeamShots.ZONE_DETAIL.values))
 colors = [cm(i) for i in range(n_zones)]
 
 # plot the x-y coordinates of each shot and color by ZONE_DETAIL
 sns.lmplot(data = TeamShots, x = 'LOC_X', y = 'LOC_Y', hue = 'ZONE_DETAIL',
-            palette = colors, fit_reg = False, scatter_kws = {'s':5})
+            palette = 'tab20', fit_reg = False, scatter_kws = {'s':5})
 plt.savefig("ZONE_DETAIL_Court_Location.png")
 plt.close()
 
