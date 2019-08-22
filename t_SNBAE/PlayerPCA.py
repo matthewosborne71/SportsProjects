@@ -5,8 +5,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import Path
 
+# Get path
 path = Path.get_path()
 
+# Write the name of the player file you'd like to perform
+# PCA on here
 file = "player_shots_by_zone_2018-19.csv"
 
 # Read in the aggregated shot data

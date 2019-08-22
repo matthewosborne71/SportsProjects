@@ -20,8 +20,8 @@ pca = PCA(n_components = len(variables))
 pca.fit(X)
 
 # Uncomment this to see the explained_variance_ratio_
-#plt.plot(np.cumsum(pca.explained_variance_ratio_))
-#plt.show()
+plt.plot(np.cumsum(pca.explained_variance_ratio_))
+plt.show()
 
 # Make a dataframe for the components.
 components = pd.DataFrame({'feature': variables})
@@ -39,6 +39,7 @@ fit = pca.transform(X)
 # Record the first two coordinates for plotting
 team_by_zone['pca_1'] = fit[:,0]
 team_by_zone['pca_2'] = fit[:,1]
+team_by_zone['pca_3'] = fit[:,2]
 
 # Update Team_Shots_by_Zone.csv to include pca components
 team_by_zone.to_csv(path + "Team_Shots_by_Zone.csv", index = False)
