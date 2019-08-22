@@ -835,16 +835,16 @@
                             .data(data)
                             .filter(function(d){return (d.Season != "2011-12") &&
                                                         (d.Season != "2012-13");})
-                            .transition("1")
+                            .transition("circles")
                             .duration(500)
                             .attr("opacity",.05)
 
 
-                    hardenLine.transition("2")
+                    hardenLine.transition("hardenLine")
                                 .delay(200)
                                 .attr("opacity",1);
 
-                    hardenLine.transition("3")
+                    hardenLine.transition("hardenLine")
                                 .delay(600)
                                 .duration(1000)
                                 .attr("x2", function(){return xScale(parseFloat(harden0.pca_1) + hardenHyp);})
@@ -866,7 +866,7 @@
                                 .duration(500)
                                 .attr("opacity",.3);
 
-                    hardenText.transition("5")
+                    hardenText.transition("hardenText")
                                 .delay(3000)
                                 .attr("x", function(){return xScale(parseFloat(harden0.pca_1));})
                                 .attr("y", function(){return yScale(parseFloat(harden0.pca_2))+40;})
@@ -880,7 +880,7 @@
                             .data(data)
                             .filter(function(d){return (d.Season === "2011-12") ||
                                                         (d.Season === "2012-13");})
-                            .transition("10")
+                            .transition("circles")
                             .delay(8100)
                             .duration(500)
                             .attr("opacity",.3);
@@ -889,16 +889,16 @@
                             .data(data)
                             .filter(function(d){return (d.Season === "2015-16") ||
                                                 (d.Season === "2016-17");})
-                            .transition("11")
+                            .transition("circles")
                             .delay(8600)
                             .duration(500)
                             .attr("opacity",1);
 
-                    dantoniLine.transition("12")
+                    dantoniLine.transition("dantoniLine")
                                 .delay(8600)
                                 .attr("opacity",1);
 
-                    dantoniLine.transition("13")
+                    dantoniLine.transition("dantoniLine")
                                 .delay(9100)
                                 .duration(1000)
                                 .attr("x2", function(){console.log(dantoni0.pca_1 + dantoniHyp)
@@ -918,7 +918,7 @@
                                 .attr("x2",function() { return xScale(parseFloat(dantoni1.pca_1)); })
                                 .attr("y2",function() { return yScale(parseFloat(dantoni1.pca_2)); });
 
-                    dantoniText.transition("15")
+                    dantoniText.transition("dantoniText")
                                 .delay(12000)
                                 .attr("x", function(){return xScale(parseFloat(dantoni0.pca_1));})
                                 .attr("y", function(){return yScale(parseFloat(dantoni0.pca_2))+ 190;})
@@ -929,12 +929,12 @@
                                 .attr("fill","white");
 
                     svg.selectAll("circle")
-                            .transition("16")
+                            .transition("circles")
                             .delay(17000)
                             .duration(500)
                             .attr("opacity",1);
 
-                    hardenLine.transition("17")
+                    hardenLine.transition("hardenLine")
                             .delay(17000)
                             .duration(500)
                             .attr("opacity",1);
@@ -943,6 +943,18 @@
                 }
 
                 function mouseout() {
+                    svg.selectAll("circle")
+                        .interrupt("circle");
+
+                    hardenText.interrupt("hardenText");
+
+                    hardenLine.interrupt("hardenLine");
+
+                    dantoniText.interrupt("dantoniText");
+
+                    dantoniLine.interrupt("dantoniLine");
+
+
                     svg.selectAll("circle")
                             .transition("1")
                             .duration(500)
@@ -1244,6 +1256,19 @@
                         .delay(0)
                         .duration(0)
                         .attr("opacity",0);
+
+                    var ids = ["#fourteen","#fifteen","#sixteen","#seventeen","#eighteen"];
+
+                    ids.forEach(function (item, index) {
+                      d3.select(item)
+                          .interrupt("num_teams");
+
+                      d3.select(item)
+                          .transition("num_teams")
+                          .text("");
+                    });
+
+
 
                     var note = svg.selectAll("#note");
 
