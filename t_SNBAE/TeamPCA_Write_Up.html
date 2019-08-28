@@ -117,7 +117,7 @@
               <div id = "warriors-button-div" style = "margin: auto; position: relative; top:50px; left: -50px;">
                 <button id="warriors-button" style = "font-size:16px; padding: 5px 2px;">Start!</button>
 
-                <p style = "font-size:125%"><b>Teams Right of The Warriors</b> <br> <br>
+                <p style = "font-size:125%"><b>Number Right of The Warriors</b> <br> <br>
                   2014-15: <span id = "fourteen"></span> <br>
                   2015-16: <span id = "fifteen"></span> <br>
                   2016-17: <span id = "sixteen"></span> <br>
@@ -849,19 +849,19 @@
                                 .duration(1000)
                                 .attr("x2", function(){return xScale(parseFloat(harden0.pca_1) + hardenHyp);})
                                 .attr("y2", function(){return yScale(parseFloat(harden0.pca_2));})
-                                .transition("4")
+                                .transition("hardenLine")
                                 .delay(800)
                                 .duration(1000)
                                 .attr("y1", function(){return yScale(parseFloat(harden0.pca_2))+50;})
                                 .attr("y2", function(){return yScale(parseFloat(harden0.pca_2))+50;})
-                                .transition("7")
+                                .transition("hardenLine")
                                 .delay(3400)
                                 .duration(1000)
                                 .attr("x1",function() { return xScale(parseFloat(harden0.pca_1)); })
                                 .attr("y1",function() { return yScale(parseFloat(harden0.pca_2)); })
                                 .attr("x2",function() { return xScale(parseFloat(harden1.pca_1)); })
                                 .attr("y2",function() { return yScale(parseFloat(harden1.pca_2)); })
-                                .transition("9")
+                                .transition("hardenLine")
                                 .delay(500)
                                 .duration(500)
                                 .attr("opacity",.3);
@@ -870,9 +870,9 @@
                                 .delay(3000)
                                 .attr("x", function(){return xScale(parseFloat(harden0.pca_1));})
                                 .attr("y", function(){return yScale(parseFloat(harden0.pca_2))+40;})
-                                .transition("6")
+                                .transition("hardenText")
                                 .attr("fill","black")
-                                .transition("8")
+                                .transition("hardenText")
                                 .delay(3500)
                                 .attr("fill","white");
 
@@ -903,12 +903,12 @@
                                 .duration(1000)
                                 .attr("x2", function(){return xScale(parseFloat(dantoni0.pca_1) + dantoniHyp);})
                                 .attr("y2", function(){return yScale(parseFloat(dantoni0.pca_2));})
-                                .transition("14")
+                                .transition("dantoniLine")
                                 .delay(800)
                                 .duration(1000)
                                 .attr("y1", function(){return yScale(dantoni0.pca_2) + 200;})
                                 .attr("y2", function(){return yScale(dantoni0.pca_2) + 200;})
-                                .transition("16")
+                                .transition("dantoniLine")
                                 .delay(3400)
                                 .duration(1000)
                                 .attr("x1",function() { return xScale(parseFloat(dantoni0.pca_1)); })
@@ -920,9 +920,9 @@
                                 .delay(12000)
                                 .attr("x", function(){return xScale(parseFloat(dantoni0.pca_1));})
                                 .attr("y", function(){return yScale(parseFloat(dantoni0.pca_2))+ 190;})
-                                .transition("6")
+                                .transition("dantoniText")
                                 .attr("fill","black")
-                                .transition("8")
+                                .transition("dantoniText")
                                 .delay(3300)
                                 .attr("fill","white");
 
@@ -942,7 +942,16 @@
 
                 function mouseout() {
                     svg.selectAll("circle")
+                        .interrupt("circles");
+
+                    /*svg.selectAll("circle")
+                        .interrupt("circle2");
+
+                    svg.selectAll("circle")
                         .interrupt("circle");
+
+                    svg.selectAll("circle")
+                        .interrupt("circle");*/
 
                     hardenText.interrupt("hardenText");
 
@@ -1025,11 +1034,29 @@
                 var padding = 75;
                 var buffer = .02;
 
+                var allStar0 = data.find(item => item.Season === "2015-16");
+                var allStar1 = data.find(item => item.Season === "2016-17");
+
+                var allStar_pca1_diff = parseFloat(allStar0.pca_1) - parseFloat(allStar1.pca_1);
+                var allStar_pca2_diff = parseFloat(allStar0.pca_2) - parseFloat(allStar1.pca_2);
+
+                var allStarHyp = hyp(allStar_pca1_diff,allStar_pca2_diff);
+
+                var Bud0 = data.find(item => item.Season === "2017-18");
+                var Bud1 = data.find(item => item.Season === "2018-19");
+
+                var Bud_pca1_diff = parseFloat(Bud0.pca_1) - parseFloat(Bud1.pca_1);
+                var Bud_pca2_diff = parseFloat(Bud0.pca_2) - parseFloat(Bud1.pca_2);
+
+                var BudHyp = hyp(Bud_pca1_diff,Bud_pca2_diff);
+
 
                 var svg = d3.select("#bucks-plot")
                             .append("svg")
                             .attr("width", width)
-                            .attr("height",height);
+                            .attr("height",height)
+                            .on("mouseover",mouseover)
+                            .on("mouseout",mouseout);
 
 
 
@@ -1049,6 +1076,24 @@
                 // Make y axis
                 var yAxis = d3.axisLeft(yScale);
 
+                var allStarLine = svg.append("line")
+                                        .attr("x1",function() { return xScale(parseFloat(allStar0.pca_1)); })
+                                        .attr("y1",function() { return yScale(parseFloat(allStar0.pca_2)); })
+                                        .attr("x2",function() { return xScale(parseFloat(allStar1.pca_1)); })
+                                        .attr("y2",function() { return yScale(parseFloat(allStar1.pca_2)); })
+                                        .style("stroke","black")
+                                        .style("stroke-width",3)
+                                        .attr("opacity",0);
+
+
+                var BudLine = svg.append("line")
+                                        .attr("x1",function() { return xScale(parseFloat(Bud0.pca_1)); })
+                                        .attr("y1",function() { return yScale(parseFloat(Bud0.pca_2)); })
+                                        .attr("x2",function() { return xScale(parseFloat(Bud1.pca_1)); })
+                                        .attr("y2",function() { return yScale(parseFloat(Bud1.pca_2)); })
+                                        .style("stroke","black")
+                                        .style("stroke-width",3)
+                                        .attr("opacity",0);
 
 
                 svg.selectAll("circle")
@@ -1061,9 +1106,11 @@
                     .attr("fill","#EEE1C6")
                     .attr("stroke","#00471B")
                     .attr("stroke-width",4)
-                    .attr("opacity",.75)
+                    .attr("opacity",1)
                     .append("svg:title")
                     .text(function(d) { return d.Season; });
+
+
 
 
 
@@ -1078,6 +1125,206 @@
                     .call(yAxis);
 
 
+
+                var allStarText = svg.append("text")
+                                        .attr("font-size",20)
+                                        .attr("fill","white")
+                                        .attr("x", -50)
+                                        .attr("y",-50)
+                                        .text("Giannis's first All Star season");
+
+
+                var BudText = svg.append("text")
+                                        .attr("font-size",20)
+                                        .attr("fill","white")
+                                        .attr("x", -50)
+                                        .attr("y",-50)
+                                        .text("Jason Kidd is replaced with Mike Budenholzer");
+
+                function mouseover(){
+                  svg.selectAll("circle")
+                        .data(data)
+                        .filter(function(d){return (d.Season != "2015-16") &&
+                                                    (d.Season != "2016-17");})
+                        .transition("circles")
+                        .duration(500)
+                        .attr("opacity",.05);
+
+                  svg.selectAll("circle")
+                        .data(data)
+                        .filter(function(d){return (d.Season === "2015-16") ||
+                                                    (d.Season === "2016-17");})
+                        .transition("circles")
+                        .delay(8500)
+                        .duration(500)
+                        .attr("opacity",.05);
+
+                  svg.selectAll("circle")
+                        .data(data)
+                        .filter(function(d){return (d.Season === "2017-18") ||
+                                                    (d.Season === "2018-19");})
+                        .transition("circles")
+                        .delay(8500)
+                        .duration(500)
+                        .attr("opacity",1);
+
+
+
+
+                  allStarLine.transition("allStarLine")
+                              .delay(200)
+                              .attr("opacity",1);
+
+                  allStarLine.transition("allStarLine")
+                              .delay(600)
+                              .duration(1000)
+                              .attr("x2", function(){return xScale(parseFloat(allStar0.pca_1) + allStarHyp);})
+                              .attr("y2", function(){return yScale(parseFloat(allStar0.pca_2));})
+                              .transition("allStarLine")
+                              .delay(800)
+                              .duration(1000)
+                              .attr("y1", function(){return yScale(parseFloat(allStar0.pca_2))+200;})
+                              .attr("y2", function(){return yScale(parseFloat(allStar0.pca_2))+200;})
+                              .transition("allStarLine")
+                              .delay(3400)
+                              .duration(1000)
+                              .attr("x1",function() { return xScale(parseFloat(allStar0.pca_1)); })
+                              .attr("y1",function() { return yScale(parseFloat(allStar0.pca_2)); })
+                              .attr("x2",function() { return xScale(parseFloat(allStar1.pca_1)); })
+                              .attr("y2",function() { return yScale(parseFloat(allStar1.pca_2)); })
+                              .transition("allStarLine")
+                              .delay(650)
+                              .duration(500)
+                              .attr("opacity",.05)
+                              .transition("allStarLine")
+                              .delay(7000)
+                              .duration(500)
+                              .attr("opacity",1)
+                              .transition("allStarLine")
+                              .delay(2700)
+                              .duration(500)
+                              .attr("opacity",0);
+
+                  allStarText.transition("allStarText")
+                              .delay(3000)
+                              .attr("x", function(){return xScale(parseFloat(allStar0.pca_1));})
+                              .attr("y", function(){return yScale(parseFloat(allStar0.pca_2))+190;})
+                              .transition("allStarText")
+                              .attr("fill","black")
+                              .transition("allStarText")
+                              .delay(3500)
+                              .duration(0)
+                              .attr("fill","white")
+                              .attr("x",-50)
+                              .attr("y",-50);
+
+
+                  BudLine.transition("BudLine")
+                              .delay(8500)
+                              .duration(500)
+                              .attr("opacity",1)
+                              .transition("BudLine")
+                              .delay(800)
+                              .duration(1000)
+                              .attr("y1", function(){return yScale(parseFloat(Bud0.pca_2))+80;})
+                              .attr("y2", function(){return yScale(parseFloat(Bud0.pca_2))+80;})
+                              .transition("BudLine")
+                              .delay(3400)
+                              .duration(1000)
+                              .attr("x1",function() { return xScale(parseFloat(Bud0.pca_1)); })
+                              .attr("y1",function() { return yScale(parseFloat(Bud0.pca_2)); })
+                              .attr("x2",function() { return xScale(parseFloat(Bud1.pca_1)); })
+                              .attr("y2",function() { return yScale(parseFloat(Bud1.pca_2)); })
+                              .transition("BudLine")
+                              .delay(4000)
+                              .duration(500)
+                              .attr("opacity",0);
+
+                  BudText.transition("BudText")
+                              .delay(10200)
+                              .attr("x", function(){return xScale(parseFloat(Bud0.pca_1)) - 100;})
+                              .attr("y", function(){return yScale(parseFloat(Bud0.pca_2))+70;})
+                              .transition("BudText")
+                              .attr("fill","black")
+                              .transition("BudText")
+                              .delay(3500)
+                              .duration(0)
+                              .attr("fill","white")
+                              .attr("x",-50)
+                              .attr("y",-50);
+
+                  svg.selectAll("circle")
+                        .transition("circles")
+                        .delay(16000)
+                        .duration(500)
+                        .attr("opacity",1);
+
+
+                }
+
+                function mouseout(){
+                  svg.selectAll("circle")
+                      .interrupt("circles");
+
+                  allStarText.interrupt("allStarText");
+
+                  allStarLine.interrupt("allStarLine");
+
+                  BudText.interrupt("BudText");
+
+                  BudLine.interrupt("BudLine");
+
+
+                  svg.selectAll("circle")
+                          .transition("1")
+                          .duration(0)
+                          .attr("opacity",1);
+
+                  allStarLine.transition("2")
+                              .duration(0)
+                              .attr("opacity",0);
+
+                  allStarLine.transition("3")
+                              .duration(0)
+                              .attr("x1", function(){return xScale(parseFloat(allStar0.pca_1));})
+                              .attr("y1", function(){return yScale(parseFloat(allStar0.pca_2));})
+                              .attr("x2", function(){return xScale(parseFloat(allStar1.pca_1));})
+                              .attr("y2", function(){return yScale(parseFloat(allStar1.pca_2));});
+
+
+
+
+
+                  BudLine.transition("4")
+                              .duration(0)
+                              .attr("opacity",0);
+
+                  BudLine.transition("5")
+                              .delay(0)
+                              .attr("x1", function(){return xScale(parseFloat(Bud0.pca_1));})
+                              .attr("y1", function(){return yScale(parseFloat(Bud0.pca_2));})
+                              .attr("x2", function(){return xScale(parseFloat(Bud1.pca_1));})
+                              .attr("y2", function(){return yScale(parseFloat(Bud1.pca_2));});
+
+                  allStarText.transition("6")
+                              .duration(0)
+                              .attr("fill","white")
+                              .transition("8")
+                              .duration(0)
+                              .delay(100)
+                              .attr("x",-50)
+                              .attr("y",-50);
+
+                  BudText.transition("7")
+                              .attr("fill","white")
+                              .transition("9")
+                              .duration(0)
+                              .delay(100)
+                              .attr("x",-50)
+                              .attr("y",-60);
+                }
+
+
             });
 
             d3.csv("Data/Nets.csv").then(function(data){
@@ -1086,11 +1333,21 @@
                 var padding = 75;
                 var buffer = .02;
 
+                var nets0 = data.find(item => item.Season === "2015-16");
+                var nets1 = data.find(item => item.Season === "2016-17");
+
+                var nets_pca1_diff = parseFloat(nets0.pca_1) - parseFloat(nets1.pca_1);
+                var nets_pca2_diff = parseFloat(nets0.pca_2) - parseFloat(nets1.pca_2);
+
+                var netsHyp = hyp(nets_pca1_diff,nets_pca2_diff);
+
 
                 var svg = d3.select("#nets-plot")
                             .append("svg")
                             .attr("width", width)
-                            .attr("height",height);
+                            .attr("height",height)
+                            .on("mouseover",mouseover)
+                            .on("mouseout",mouseout);
 
 
 
@@ -1109,6 +1366,24 @@
 
                 // Make y axis
                 var yAxis = d3.axisLeft(yScale);
+
+                var netsLine = svg.append("line")
+                                        .attr("x1",function() { return xScale(parseFloat(nets0.pca_1)); })
+                                        .attr("y1",function() { return yScale(parseFloat(nets0.pca_2)); })
+                                        .attr("x2",function() { return xScale(parseFloat(nets1.pca_1)); })
+                                        .attr("y2",function() { return yScale(parseFloat(nets1.pca_2)); })
+                                        .style("stroke","black")
+                                        .style("stroke-width",3)
+                                        .attr("opacity",0);
+
+                var netsText = svg.append("text")
+                                        .attr("font-size",20)
+                                        .attr("fill","white")
+                                        .attr("x", -50)
+                                        .attr("y",-50)
+                                        .text("Sean Marks Hires Coach Kenny Atkinson");
+
+
 
 
 
@@ -1137,6 +1412,94 @@
                 svg.append("g")
                     .attr("transform", "translate(" + padding + ",0)")
                     .call(yAxis);
+
+
+                function mouseover() {
+                    svg.selectAll("circle")
+                            .data(data)
+                            .filter(function(d){return (d.Season != "2015-16") &&
+                                                        (d.Season != "2016-17");})
+                            .transition("circles")
+                            .duration(500)
+                            .attr("opacity",.05)
+                            .transition("circles")
+                            .delay(9000)
+                            .duration(500)
+                            .attr("opacity",1);
+
+
+                    netsLine.transition("netsLine")
+                                .delay(200)
+                                .attr("opacity",1);
+
+                    netsLine.transition("netsLine")
+                                .delay(600)
+                                .duration(1000)
+                                .attr("x2", function(){return xScale(parseFloat(nets0.pca_1) + netsHyp);})
+                                .attr("y2", function(){return yScale(parseFloat(nets0.pca_2));})
+                                .transition("netsLine")
+                                .delay(800)
+                                .duration(1000)
+                                .attr("y1", function(){return yScale(parseFloat(nets0.pca_2))+50;})
+                                .attr("y2", function(){return yScale(parseFloat(nets0.pca_2))+50;})
+                                .transition("netsLine")
+                                .delay(3400)
+                                .duration(1000)
+                                .attr("x1",function() { return xScale(parseFloat(nets0.pca_1)); })
+                                .attr("y1",function() { return yScale(parseFloat(nets0.pca_2)); })
+                                .attr("x2",function() { return xScale(parseFloat(nets1.pca_1)); })
+                                .attr("y2",function() { return yScale(parseFloat(nets1.pca_2)); })
+                                .transition("netsLine")
+                                .delay(4000)
+                                .duration(500)
+                                .attr("opacity",0);
+
+                    netsText.transition("netsText")
+                                .delay(3000)
+                                .attr("x", function(){return xScale(parseFloat(nets0.pca_1));})
+                                .attr("y", function(){return yScale(parseFloat(nets0.pca_2))+40;})
+                                .transition("6")
+                                .attr("fill","black")
+                                .transition("8")
+                                .delay(3500)
+                                .attr("fill","white");
+
+
+
+
+                }
+
+                function mouseout() {
+                    svg.selectAll("circle")
+                        .interrupt("circles");
+
+                    netsText.interrupt("netsText");
+
+                    netsLine.interrupt("netsLine");
+
+
+                    svg.selectAll("circle")
+                            .transition("1")
+                            .duration(500)
+                            .attr("opacity",1);
+
+                    netsLine.transition("2")
+                                .attr("opacity",0);
+
+                    netsLine.transition("3")
+                                .delay(500)
+                                .attr("x1", function(){return xScale(parseFloat(nets0.pca_1));})
+                                .attr("y1", function(){return yScale(parseFloat(nets0.pca_2));})
+                                .attr("x2", function(){return xScale(parseFloat(nets1.pca_1));})
+                                .attr("y2", function(){return yScale(parseFloat(nets1.pca_2));});
+
+                    netsText.transition("6")
+                                .attr("fill","white")
+                                .transition("8")
+                                .delay(100)
+                                .attr("x",-50)
+                                .attr("y",-50);
+                }
 
 
             });
