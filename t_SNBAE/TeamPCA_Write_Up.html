@@ -109,6 +109,11 @@
             </div>
         </div>
 
+        <!--76ers Plot div-->
+        <div id = "sixers-div", style = "width:800 px; height: 600px; margin: auto; float:left;">
+            <div id = "sixers-plot" style = "width: 800px; height: 600px; margin: auto; float: left;">
+            </div>
+        </div>
         <!--Warriors Plot div--->
         <div id = "warriors-div", style = "width:1100 px; height: 600px; margin: auto; float:left;">
             <div id = "warriors-plot" style = "width: 800px; height: 600px; margin: auto; float: left;">
@@ -1397,7 +1402,7 @@
                     .attr("fill","#FFFFFF")
                     .attr("stroke","#000000")
                     .attr("stroke-width",4)
-                    .attr("opacity",.75)
+                    .attr("opacity",1)
                     .append("svg:title")
                     .text(function(d) { return d.Season; });
 
@@ -1503,6 +1508,182 @@
 
 
             });
+
+            d3.csv("Data/sixers.csv").then(function(data){
+              var width = 800;
+              var height = 600;
+              var padding = 75;
+              var buffer = .02;
+
+              var sixers0 = data.find(item => item.Season === "2012-13");
+              var sixers1 = data.find(item => item.Season === "2013-14");
+
+              var sixers_pca1_diff = parseFloat(sixers0.pca_1) - parseFloat(sixers1.pca_1);
+              var sixers_pca2_diff = parseFloat(sixers0.pca_2) - parseFloat(sixers1.pca_2);
+
+              var sixersHyp = hyp(sixers_pca1_diff,sixers_pca2_diff);
+
+
+              var svg = d3.select("#sixers-plot")
+                          .append("svg")
+                          .attr("width", width)
+                          .attr("height",height)
+                          .on("mouseover",mouseover)
+                          .on("mouseout",mouseout);
+
+
+
+
+              // Make x scale
+              var xScale = d3.scaleLinear()
+                              .domain([d3.min(data, function(d){return parseFloat(d.pca_1);}) - buffer, d3.max(data, function(d){return parseFloat(d.pca_1);}) + buffer])
+                                  .range([padding, width - padding]);
+
+              // Make y scale
+              var yScale = d3.scaleLinear()
+                              .domain([d3.min(data, function(d){return parseFloat(d.pca_2);}) - buffer, d3.max(data, function(d){return parseFloat(d.pca_2);}) + buffer])
+                                  .range([height - padding, padding]);
+
+              // Make x axis
+              var xAxis = d3.axisBottom(xScale);
+
+              // Make y axis
+              var yAxis = d3.axisLeft(yScale);
+
+              var sixersLine = svg.append("line")
+                                      .attr("x1",function() { return xScale(parseFloat(sixers0.pca_1)); })
+                                      .attr("y1",function() { return yScale(parseFloat(sixers0.pca_2)); })
+                                      .attr("x2",function() { return xScale(parseFloat(sixers1.pca_1)); })
+                                      .attr("y2",function() { return yScale(parseFloat(sixers1.pca_2)); })
+                                      .style("stroke","black")
+                                      .style("stroke-width",3)
+                                      .attr("opacity",0);
+
+              var sixersText = svg.append("text")
+                                      .attr("font-size",20)
+                                      .attr("fill","white")
+                                      .attr("x", -50)
+                                      .attr("y",-50)
+                                      .text("Sam Presti becomes GM");
+
+
+
+
+
+              svg.selectAll("circle")
+                  .data(data)
+                  .enter()
+                  .append("circle")
+                  .attr("cx",function(d){return xScale(parseFloat(d.pca_1));})
+                  .attr("cy",function(d){return yScale(parseFloat(d.pca_2));})
+                  .attr("r",6)
+                  .attr("fill","#ED174C")
+                  .attr("stroke","#006BB6")
+                  .attr("stroke-width",4)
+                  .attr("opacity",1)
+                  .append("svg:title")
+                  .text(function(d) { return d.Season; });
+
+
+
+              // put on the x axis
+              svg.append("g")
+                  .attr("transform", "translate(0, " + (height - padding) +")")
+                  .call(xAxis);
+
+              // put on the y axis
+              svg.append("g")
+                  .attr("transform", "translate(" + padding + ",0)")
+                  .call(yAxis);
+
+
+                  function mouseover() {
+                      svg.selectAll("circle")
+                              .data(data)
+                              .filter(function(d){return (d.Season != "2012-13") &&
+                                                          (d.Season != "2013-14");})
+                              .transition("circles")
+                              .duration(500)
+                              .attr("opacity",.05)
+                              .transition("circles")
+                              .delay(9000)
+                              .duration(500)
+                              .attr("opacity",1);
+
+
+                      sixersLine.transition("sixersLine")
+                                  .delay(200)
+                                  .attr("opacity",1);
+
+                      sixersLine.transition("sixersLine")
+                                  .delay(600)
+                                  .duration(1000)
+                                  .attr("x2", function(){return xScale(parseFloat(sixers0.pca_1) + sixersHyp);})
+                                  .attr("y2", function(){return yScale(parseFloat(sixers0.pca_2));})
+                                  .transition("sixersLine")
+                                  .delay(800)
+                                  .duration(1000)
+                                  .attr("y1", function(){return yScale(parseFloat(sixers0.pca_2))+50;})
+                                  .attr("y2", function(){return yScale(parseFloat(sixers0.pca_2))+50;})
+                                  .transition("sixersLine")
+                                  .delay(3400)
+                                  .duration(1000)
+                                  .attr("x1",function() { return xScale(parseFloat(sixers0.pca_1)); })
+                                  .attr("y1",function() { return yScale(parseFloat(sixers0.pca_2)); })
+                                  .attr("x2",function() { return xScale(parseFloat(sixers1.pca_1)); })
+                                  .attr("y2",function() { return yScale(parseFloat(sixers1.pca_2)); })
+                                  .transition("sixersLine")
+                                  .delay(4000)
+                                  .duration(500)
+                                  .attr("opacity",0);
+
+                      sixersText.transition("sixersText")
+                                  .delay(3000)
+                                  .attr("x", function(){return xScale(parseFloat(sixers0.pca_1));})
+                                  .attr("y", function(){return yScale(parseFloat(sixers0.pca_2))+40;})
+                                  .transition("6")
+                                  .attr("fill","black")
+                                  .transition("8")
+                                  .delay(3500)
+                                  .attr("fill","white");
+
+
+
+
+                  }
+
+                  function mouseout() {
+                      svg.selectAll("circle")
+                          .interrupt("circles");
+
+                      sixersText.interrupt("sixersText");
+
+                      sixersLine.interrupt("sixersLine");
+
+
+                      svg.selectAll("circle")
+                              .transition("1")
+                              .duration(500)
+                              .attr("opacity",1);
+
+                      sixersLine.transition("2")
+                                  .attr("opacity",0);
+
+                      sixersLine.transition("3")
+                                  .delay(500)
+                                  .attr("x1", function(){return xScale(parseFloat(sixers0.pca_1));})
+                                  .attr("y1", function(){return yScale(parseFloat(sixers0.pca_2));})
+                                  .attr("x2", function(){return xScale(parseFloat(sixers1.pca_1));})
+                                  .attr("y2", function(){return yScale(parseFloat(sixers1.pca_2));});
+
+                      sixersText.transition("6")
+                                  .attr("fill","white")
+                                  .transition("8")
+                                  .delay(100)
+                                  .attr("x",-50)
+                                  .attr("y",-50);
+                  }
+            })
 
             d3.csv("Data/14_15_use.csv").then(function(data){
                 var width = 800;
