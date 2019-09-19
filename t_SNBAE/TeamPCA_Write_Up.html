@@ -15,324 +15,1008 @@
                 fill: red;
             }
 
+            p {
+              font-size: 20px;
+              padding-left: 20px;
+            }
+
+            h1,h2,h3,h4 {
+              padding-left: 20px;
+            }
+
             .line {
                 fill: none;
                 stroke: black;
                 stroke-width: 3;
             }
+
+            table{
+              border-collapse: collapse;
+              width: 100%;
+            }
+
+            th{
+              border-bottom: 1px solid;
+              padding-right: 15px;
+              text-align: left;
+              font-size: 24px;
+            }
+
+            td{
+              text-align: left;
+              padding-right: 15px;
+              text-align: left;
+              font-size: 18px;
+            }
+
+            tr:hover {background-color: #A9A9A9;}
 		</style>
     </head>
     <body>
-        <h2 id="title">
+        <h1 id="title">
             Working Title
-        </h2>
-        <h4 id="author">
+        </h1>
+        <h3 id="author">
             Matthew Osborne
-        </h4>
+        </h3>
+
+        <div id = "writing" style = "width: auto; max-width: 1300px;">
+          <p style = "font-size:40px;">
+            <q>What these youngbloods have to understand
+            is that this game has always been, and will always be, about buckets.</q>
+            -Bill Russell
+          </p>
+
+          <p>
+            Throughout the 2018-19 regular season NBA teams took, on average,
+            about 89 shots per game, that's less than 23 a quarter.  In a game
+            all about buckets, there really aren't many to go around. With shots
+            being such a limited resource, their allocation can (and already has)
+            greatly alter(ed) the game as we know it.
+          </p>
+
+          <p>
+            Ever since the advent of Moreyball there's been a deluge of takes on
+            the shift towards the three heavy offense. Now, the point of this post is
+            not to be the Kent Brockman of threes - I for one welcome our new
+            three point overlords! - nor wax poetic about behemoths methodically
+            backing eachother down in the post. Rather, this post will introduce a novel
+            way of examining the distribution of a team's shots around the court.
+            In particular, a very popular data science technique, principal
+            components analysis (PCA), will be applied to raw shot distribution
+            data.
+          </p>
+
+          <h2>The Data</h2>
+
+          <p>
+            The NBA began accurately tracking the x,y position of every shot taken
+            during a game back in the 2000-01 regular season. Using the python package
+            <a href = "https://github.com/swar/nba_api">nba_api</a> this data can
+            be collected to be analyzed. Every single post up, fade-away jumper,
+            or step-back three taken occurs in one of 15 sections of a court,
+            outlined below.
+          </p>
 
 
-        <!--This holds the main plot--->
-        <div id = "main-holder" style = "width:1300px; height:800px; margin:auto; float:left;">
-            <div id = "main-plot" style = "width:1000px; height:750px; float:left;">
+          <div id = "court-holder" style = "width:1300px; margin:auto; float:left;">
+            <div id = "court-image" style = "width:500px; margin:auto; float:left;">
+              <img src="test.png" alt="Shot Zones" style = "width:500px;">
             </div>
-            <div id = "side-text" style = "width:300px; height:400px; float:right;">
-                <div id = "buttons" style = "width:300px; height:50px; float:top;">
-                    <p>Highlighted Season: <span id = "season-button"></span> <br>
-                        Highlighted Team: <span id = "team-button"></span>
-                    </p>
-                </div>
-                <div id = "text" style = "width:300px; height:350px; float:bottom;">
-                    <p style = "font-size:125%"><strong>Season: </strong> <span id = "Season" style= "color:white;"></span>
-                    <br>
-                    <strong>Team: </strong> <span id = "Team" style = "color:white;"></span><br>
-                    <span style = "font-size:90%">
-                    Shots in the Paint: <span id = "paint"></span> <br>
-                    Shots from Midrange: <span id = "midrange"></span> <br>
-                    Shots from 3: <span id = "three"></span></span>
-                    </p>
-                </div>
+            <div id = "court-table" style = "margin:auto; float:left;">
+              <table style="width:100%">
+              <tr >
+                <th>ID</th>
+                <th>Zone Name</th>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>Restricted Area</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>In the Paint, Center</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>In the Paint, Left</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>In the Paint, Right</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>Mid-Range, Left</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td>Mid-Range, Right</td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td>Mid-Range, Center-Left</td>
+              </tr>
+              <tr>
+                <td>8</td>
+                <td>Mid-Range, Center-Right</td>
+              </tr>
+              <tr>
+                <td>9</td>
+                <td>Mid-Range, Center</td>
+              </tr>
+              <tr>
+                <td>10</td>
+                <td>Left Corner 3</td>
+              </tr>
+              <tr>
+                <td>11</td>
+                <td>Right Corner 3</td>
+              </tr>
+              <tr>
+                <td>12</td>
+                <td>Above the Break 3, Left</td>
+              </tr>
+              <tr>
+                <td>13</td>
+                <td>Above the Break 3, Right</td>
+              </tr>
+              <tr>
+                <td>14</td>
+                <td>Above the Break 3, Center</td>
+              </tr>
+              <tr>
+                <td>15</td>
+                <td>Backcourt</td>
+              </tr>
+            </table>
             </div>
+      </div>
+
+
+        <p>
+          With the shot data from the NBA's official stats, each atttempt can be
+          classified as occurring in one of these 15 zones. A team's shot zone distribution
+          can then be created by taking the percentage of a team's total attempts that
+          occurred in each zone. For example, here is the shot distribution for the
+          2018-19 World Champion Toronto Raptors.
+        </p>
+
+        <div id = "toronto-table" style = "width:1300px; padding-left:20px; padding-bottom: 10px; margin:auto; float:left;">
+          <table style="width:500px;">
+            <tr >
+              <th>Zone</th>
+              <th>% of Toronto's Attempts</th>
+            </tr>
+            <tr>
+              <td>Restricted Area</td>
+              <td>32.16</td>
+            </tr>
+            <tr>
+              <td>In the Paint, Center</td>
+              <td>14.31</td>
+            </tr>
+            <tr>
+              <td>In the Paint, Left</td>
+              <td>0.55</td>
+            </tr>
+            <tr>
+              <td>In the Paint, Right</td>
+              <td>0.68</td>
+            </tr>
+            <tr>
+              <td>Mid-Range, Left</td>
+              <td>3.38</td>
+            </tr>
+            <tr>
+              <td>Mid-Range, Right</td>
+              <td>3.75</td>
+            </tr>
+            <tr>
+              <td>Mid-Range, Center-Left</td>
+              <td>1.74</td>
+            </tr>
+            <tr>
+              <td>Mid-Range, Center-Right</td>
+              <td>2.53</td>
+            </tr>
+            <tr>
+              <td>Mid-Range, Center</td>
+              <td>3.01</td>
+            </tr>
+            <tr>
+              <td>Left Corner 3</td>
+              <td>5.52</td>
+            </tr>
+            <tr>
+              <td>Right Corner 3</td>
+              <td>5.31</td>
+            </tr>
+            <tr>
+              <td>Above the Break 3, Left</td>
+              <td>9.16</td>
+            </tr>
+            <tr>
+              <td>Above the Break 3, Right</td>
+              <td>9.71</td>
+            </tr>
+            <tr>
+              <td>Above the Break 3, Center</td>
+              <td>7.98</td>
+            </tr>
+            <tr>
+              <td>Backcourt</td>
+              <td>0.22</td>
+            </tr>
+          </table>
         </div>
 
-        <!--This holds the time lapse plot--->
-        <div id = "time-holder" style = "width:1000px; height:700px; margin:auto; float:left;">
-            <div id = "time-lapse-plot" style = "width:900px; height:750px; float:left;">
-            </div>
-            <div id = "time-side" style = "width:100px; height 650px; float:right;">
-                <div id = "time-button" style = "width:100px; height 650px; position: relative; top:60px; left: -100px;">
-                    <button type="button" style = "font-size:16px; padding: 5px 2px;">Start!</button>
-                </div>
-            </div>
-        </div>
 
-        <!-- This holds the three plot --->
-        <div id = "three-div", style = "width:900px; height:650px; margin:auto; float:left;">
-            <div id = "three-plot" style = "width:800px; height:650px; margin:auto; float:left;">
-            </div>
-            <div id = "three-legend" style = "width:100px; height:650px; margin:auto; float:left;">
-            </div>
-        </div>
 
-        <!-- This holds the close plot --->
-        <div id = "close-div", style = "width:900px; height:650px; margin:auto; float:left;">
-            <div id = "close-plot" style = "width:800px; height:650px; margin:auto; float:left;">
-            </div>
-            <div id = "close-legend" style = "width:100px; height:650px; margin:auto; float:left;">
-            </div>
-        </div>
+  <p>
+    These shot distributions provide a snapshot of how a team allocated its limited
+    resource in a particular season. This is great, however, it is slightly unmanageable
+    to track how 15 numbers change over the course of 20 or so seasons. It would
+    be nice if we could reduce that to one or two numbers to track over time.
+  </p>
 
-        <!-- This holds the efficiency plot --->
-        <div id = "eff-div", style = "width:900px; height:650px; margin:auto; float:left;">
-            <div id = "eff-plot" style = "width:800px; height:650px; margin:auto; float:left;">
-            </div>
-            <div id = "eff-legend" style = "width:100px; height:650px; margin:auto; float:left;">
-            </div>
-        </div>
+  <h2>
+    PCA in the NBA
+  </h2>
 
-        <!--Rockets Plot div--->
-        <div id = "rockets-div", style = "width:800 px; height: 600px; margin: auto; float:left;">
-            <div id = "rockets-plot" style = "width: 800px; height: 600px; margin: auto; float: left;">
+    <p>
+      Enter Principal Components Analysis (PCA). PCA takes high dimensional data sets
+      and reduces them to a more manageable number of dimensions. For example, PCA can
+      take these 15 percentages and boil them down to just 1 or 2 numbers \< insert
+      super script here to link to how PCA works\>. Running the 2018-19 Toronto Raptors'
+      shot distribution through PCA produces the following two values: (0.093,-0.030).
+      Doing this for every team's shot distribution from the 2000-01 to the 2018-19
+      seaons produces the following plot, where a team's first PCA value is on the
+      horizontal axis, and the second on the vertical.
+    </p>
+    <!--This holds the main plot--->
+    <div id = "main-holder" style = "width:1300px; height:800px; margin:auto; float:left; padding-left:20px;">
+        <div id = "main-plot" style = "width:950px; height:800px; float:left;">
+        </div>
+        <div id = "side-text" style = "width:350px; height:400px; float:right;">
+            <div id = "buttons" style = "width:350px; height:50px; float:top;">
+                <p>Highlighted Season: <span id = "season-button"></span> <br>
+                    Highlighted Team: <span id = "team-button"></span>
+                </p>
+            </div>
+            <div id = "text" style = "width:300px; height:350px; float:bottom;">
+                <p style = "font-size:125%"><strong>Season: </strong> <span id = "Season" style= "color:white;"></span>
+                <br>
+                <strong>Team: </strong> <span id = "Team" style = "color:white;"></span><br>
+                <span style = "font-size:90%">
+                Shots in the Paint: <span id = "paint"></span> <br>
+                Shots from Midrange: <span id = "midrange"></span> <br>
+                Shots from 3: <span id = "three"></span></span>
+                </p>
             </div>
         </div>
+    </div>
+
+    <p>
+      <a href = "https://www.youtube.com/watch?v=TdUsyXQ8Wrs">Run, don't walk from
+        the Blob of data points!</a> Don't worry this blob can make sense. When
+        data is put through PCA, something called principal component vectors
+        are also produced. These explain what the values mean in terms of the original
+        data set. Here are the first two component vectors:
+    </p>
+
+    <div id = "component-vectors" style = "width:1250px; float:left; margin:auto;padding-left:20px; padding-bottom:20px;">
+      <div id = "first-component" style = "width:600px; float:left; margin:auto;">
+        <table style="width:570px;">
+          <tr >
+            <th>Zone</th>
+            <th>First Principal Component Score</th>
+          </tr>
+          <tr>
+            <td>
+              Mid-Range, Left
+            </td>
+            <td>
+              -0.581
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Mid-Range, Right
+            </td>
+            <td>
+              -0.483
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Mid-Range, Center-Right
+            </td>
+            <td>
+              -0.159
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Mid-Range, Center-Left
+            </td>
+            <td>
+              -0.150
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Mid-Range, Center
+            </td>
+            <td>
+              -0.055
+            </td>
+          </tr>
+          <tr>
+            <td>
+              In the Paint, Left
+            </td>
+            <td>
+              -0.020
+            </td>
+          </tr>
+          <tr>
+            <td>
+              In the Paint, Right
+            </td>
+            <td>
+              -0.012
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Backcourt
+            </td>
+            <td>
+              0.002
+            </td>
+          </tr>
+          <tr>
+            <td>
+              In the Paint, Center
+            </td>
+            <td>
+              0.057
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Left Corner 3
+            </td>
+            <td>
+              0.111
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Right Corner 3
+            </td>
+            <td>
+              0.113
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Above the Break 3, Center
+            </td>
+            <td>
+              0.259
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Restricted Area
+            </td>
+            <td>
+              0.297
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Above the Break 3, Right
+            </td>
+            <td>
+              0.307
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Above the Break 3, Left
+            </td>
+            <td>
+              0.314
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div id = "second-component" style = "width:600px; float:left; margin:auto;">
+        <table style="width:600px;">
+          <tr >
+            <th>Zone</th>
+            <th>Second Principal Component Score</th>
+          </tr>
+          <tr>
+            <td>
+              Above the Break 3, Left
+            </td>
+            <td>
+              -0.243
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Above the Break 3, Right
+            </td>
+            <td>
+              -0.232
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Above the Break 3, Center
+            </td>
+            <td>
+              -0.208
+            </td>
+          </tr>
+          <tr>
+            <td>
+              In the Paint, Center
+            </td>
+            <td>
+              -0.138
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Left Corner 3
+            </td>
+            <td>
+              -0.092
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Right Corner 3
+            </td>
+            <td>
+              -0.073
+            </td>
+          </tr>
+          <tr>
+            <td>
+              In the Paint, Left
+            </td>
+            <td>
+              -0.015
+            </td>
+          </tr>
+          <tr>
+            <td>
+              In the Paint, Right
+            </td>
+            <td>
+              -0.013
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Mid-Range, Center
+            </td>
+            <td>
+              -0.010
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Backcourt
+            </td>
+            <td>
+              0.001
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Mid-Range, Left
+            </td>
+            <td>
+              0.010
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Mid-Range, Center-Left
+            </td>
+            <td>
+              0.024
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Mid-Range, Center-Right
+            </td>
+            <td>
+              0.044
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Mid-Range, Right
+            </td>
+            <td>
+              0.048
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Restricted Area
+            </td>
+            <td>
+              0.897
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <p>
+      What do these two vectors mean? For either vector, positive vector entries
+      (rows in the table) correspond to more positive principal component values.
+      For example a team with 100% of their shots from Above the Break 3, Left will
+      have as large a first principal component value as possible because that is the
+      most positive row of the first principal component vector table. On the other
+      hand a team that shot 100% of their shots from Mid-Range Left will have as negative
+      a first principal component value as possible because that is the most negative
+      row of the first principal component vector table.
+    </p>
+
+    <p>
+      In the first principal component vector the negative court areas are those
+      that have been deemed "less efficient", the mid-range, while the most positive
+      court areas are downtown and in the restricted area. So a team's first
+      principal component value captures how much often that team took less efficient
+      shots. In terms of the earlier plot, more efficient teams step to the right
+      less efficient teams to the left please.
+    </p>
+
+    <p>
+      Below is a plot that demonstrates what was explained above. Coloring each dot
+      by the team's percentage of total shots taken from three or the
+      restricted area paints a clear picture. Going from left to right on the PCA
+      plot increases the percentage of total attempts from downtown or under the
+      basket. A team's first PCA value captures the "efficiency" of their shot
+      selection.
+    </p>
+
+    <!-- This holds the efficiency plot --->
+    <div id = "eff-div", style = "width:1300px; height:650px; margin:auto; float:left; padding-left:20px;">
+        <div id = "eff-plot" style = "width:800px; height:650px; margin:auto; float:left;">
+        </div>
+        <div id = "eff-legend" style = "width:150px; height:650px; margin:auto; float:left;">
+        </div>
+    </div>
+
+    <p>
+      The second PCA value captures how a team distributes a shot in those
+      more efficient zones. Three point zones are the most negative in the second
+      principal component vector, while the restricted area is overwhelmingly the
+      most positive. Teams that live under the rim will be found near the top of
+      the PCA value plot, while teams <a href = "https://www.cleveland.com/entertainment/2016/04/austin_carr_catch_phrases.html">
+      shooting it from deep in the [approximate name of arena where game is being
+      played]</a> can be found near the bottom. Check it out in the following two plots.
+    </p>
+
+    <!-- This holds the three plot --->
+    <div id = "three-div", style = "width:1300px; height:650px; margin:auto; float:left; padding-left:20px;">
+        <div id = "three-plot" style = "width:800px; height:650px; margin:auto; float:left;">
+        </div>
+        <div id = "three-legend" style = "width:100px; height:650px; margin:auto; float:left;">
+        </div>
+    </div>
+
+    <!-- This holds the close plot --->
+    <div id = "close-div", style = "width:1300px; height:650px; margin:auto; float:left; padding-left:20px;">
+        <div id = "close-plot" style = "width:800px; height:650px; margin:auto; float:left;">
+        </div>
+        <div id = "close-legend" style = "width:100px; height:650px; margin:auto; float:left;">
+        </div>
+    </div>
+
+    <p>
+      These PCA scores have value in tracking the how a team allocates its shot
+      attempts around the court. How can they help explain how a team or even
+      the association has changed over the last 20 seasons.
+    </p>
+
+    <h2>
+      The Great Migration from Left to Right
+    </h2>
+
+    <p>
+      With the success of the Houston Rockets' three heavy offense, much has been
+      made of the NBA's transition into a gun slinger league. Mathematically this
+      transition does make sense. According to research performed by NBA analyst
+      and geographer <a href = "https://www.espn.com/nba/story/_/id/25459090/carmelo-anthony-last-great-american-ball-hog">
+      Kirk Goldsberry</a>, the restricted area and just beyond the arc are the
+      only spots on the court with a positive return on investment, meaning the
+      only places where the expected points per shot is above 1. It is pretty straight
+      forward, 23 shots from spots with expected points per shot above 1 should
+      net more than 23 points, 23 shots from spots with expected points per shot
+      below 1 should net you less than 23 points. As a reminder, the team with
+      more points typically wins the game.
+    </p>
+
+    <p>
+      It's a copycat league, so as Houston started to have success against the
+      game's Goliath State Warriors, other teams started to follow suit devising
+      shot distributions that primarily feature these "efficient" zones of the
+      court. If this is true, it should be reflected in the PCA chart. Click the
+      'Start!' button of the graphic below to see how PCA values have progressed
+      over the last 20 seasons.
+    </p>
+
+    <!--This holds the time lapse plot--->
+    <div id = "time-holder" style = "width:1300px; height:700px; margin:auto; float:left; padding-left:20px;">
+        <div id = "time-lapse-plot" style = "width:900px; height:750px; float:left;">
+        </div>
+        <div id = "time-side" style = "width:100px; height 650px; float:left;">
+            <div id = "time-button" style = "width:100px; height 650px; position: relative; top:60px; left: -100px;">
+                <button type="button" style = "font-size:16px; padding: 5px 2px;">Start!</button>
+            </div>
+        </div>
+    </div>
+
+    <p>
+      And <a href = "https://www.youtube.com/watch?v=rjA5A86V6SY">there it is.</a>
+      As the seasons progress there is a clear shift from the left of the chart
+      (the area where less efficient midrange heavy teams live), to the right of
+      the chart (where the threes and restricted areas roam), as expected.
+    </p>
+
+    <h3>
+      If it Ain't Broke Don't Fix it
+    </h3>
+
+    <p>
+      Is this the all is lost moment for mid-range and post play? Maybe, but maybe
+      not. The Warriors have the most prolific shooting duo in history,
+      <a href = "https://www.youtube.com/watch?v=JTA5aBmmYJg">Steph</a> and
+      <a href = "https://www.youtube.com/watch?v=uRE1X_DXDp0">Klay</a>, so it's
+      a no brainer that they take advantage of this more efficient approach, right?
+      Well yes, but actually no. Click the 'Start!' button on the below plot to
+      watch Golden State's progression since 2014 compared to the rest of the
+      NBA.
+    </p>
+
+    <!--Warriors Plot div--->
+    <div id = "warriors-div", style = "width:1300 px; height: 600px; margin: auto; float:left; ">
+        <div id = "warriors-plot" style = "width: 800px; height: 600px; margin: auto; float: left;">
+        </div>
+        <div id = "warriors-side" style = "width: 500px; height: 600px; margin: auto; float: right;">
+          <div id = "warriors-button-div" style = "margin: auto; position: relative; top:50px; left: -50px;">
+            <button id="warriors-button" style = "font-size:16px; padding: 5px 2px;">Start!</button>
+
+            <p style = "font-size:24px;"><b>Number of Teams <br> Right of The Warriors</b> <br> <br>
+              2014-15: <span id = "fourteen"></span> <br>
+              2015-16: <span id = "fifteen"></span> <br>
+              2016-17: <span id = "sixteen"></span> <br>
+              2017-18: <span id = "seventeen"></span> <br>
+              2018-19: <span id = "eighteen"></span>
+            </p>
+
+          </div>
+        </div>
+    </div>
+
+    <p>
+      The Warriors start off their dynasty run ahead of the crowd when it comes to
+      shot distribution. In their record breaking 2015-16 Season they placed their shots
+      more "efficiently" than all but two teams in the league, with over 35% of their shots
+      coming from 3 (second to only the Houston Rockets). However, they then became
+      stagnant. For the seasons following 2016 they essentially stand still while
+      the rest of the association move further and further to the right. GSW ended
+      the 2018-19 season as the team with the second highest of shots from mid-range
+      (second only to the 3 detesting <a href = "https://www.youtube.com/watch?v=JR5c4ZinP9M">Spurs</a>).
+    </p>
+
+    <p>
+      But the Warriors went 3 for 5 in the NBA finals, and probably 4 for 5 if either
+      of Klay or KD don't get hurt (sorry Raptors fans, but its true). So
+      does shot distribution relative to the rest of the league even matter? If
+      a team features 4 future hall of famers, probably not so much, especially when
+      2 (possibly <a href = "https://www.youtube.com/watch?v=YVsah5EBKuI">3</a>) are
+      hall of famers because of their ability to make efficient shots. Klay and Curry
+      are so good at converting threes that their team can get away without taking
+      as many as the rest of the NBA.
+    </p>
+
+    <p>
+      It actually might now be broke though. Heading into the 2019-20 season the
+      Warriors will have to replace Kevin Durant and Klay Thompson with D'Angelo
+      Russell. While D'Angelo is a rising star, it is insanity to think Steve Kerr
+      could just slot him into the same offensive scheme and expect similar results.
+      It seems likely they will make a shift toward the right of the PCA chart.
+    </p>
+
+    <h2>
+      Taking the Leap
+    </h2>
+
+    <p>
+      Not only do these PCA coordinates capture the NBA wide transition in NBA,
+      but they can help describe the effect of particular moves a team makes between
+      seasons.
+    </p>
+
+    <h3>
+      Houston We Have a Harden
+    </h3>
+
+    <p>
+      No team is more renowned (or even reviled) for their reliance on 3s and layups
+      than the Houston Rockets. While these more "efficent" shot distributions have
+      been deemed Moreyball the PCA plot reveals that it was not Daryl that led
+      this transition. Morey has been GM of the Rockets since 2007, but Houston
+      did not significantly change its shot distribution until a few years later.
+      Hover over the below plot to see what team events do coincide with noticeable
+      changes in shot distribution.
+    </p>
+
+    <!--Rockets Plot div--->
+    <div id = "rockets-div", style = "width:1300px; height: 600px; margin: auto; float:left; padding-left:20px;">
+        <div id = "rockets-plot" style = "width: 1300px; height: 600px; margin: auto; float: left;">
+        </div>
+    </div>
+
+    <p>
+      Maybe a better name would be Hardenball? Now it could be argued that Daryl
+      discovered the competitive advantage that 3 > 2 and thus trading for a player
+      that is perfect for such an offense, and then hired a coach that would take
+      that offense to the extreme. But, it is equally likely that Morey just traded
+      for a good player that was (stupidly) available, and then built an offensive
+      system around said player that would help him, and the team, succeed. Either
+      way, it's clear that it was not what we call Moreyball until James Harden
+      touched down in Houston.
+    </p>
+
+    <h3>
+      The Bucks Start With Giannis
+    </h3>
 
 
 
         <!--Bucks Plot div--->
-        <div id = "bucks-div", style = "width:800 px; height: 600px; margin: auto; float:left;">
+        <div id = "bucks-div", style = "width:800 px; height: 600px; margin: auto; float:left; padding-left:20px;">
             <div id = "bucks-plot" style = "width: 800px; height: 600px; margin: auto; float: left;">
             </div>
         </div>
 
         <!--Nets Plot div--->
-        <div id = "nets-div", style = "width:800 px; height: 600px; margin: auto; float:left;">
+        <div id = "nets-div", style = "width:800 px; height: 600px; margin: auto; float:left; padding-left:20px;">
             <div id = "nets-plot" style = "width: 800px; height: 600px; margin: auto; float: left;">
             </div>
         </div>
 
         <!--76ers Plot div-->
-        <div id = "sixers-div", style = "width:800 px; height: 600px; margin: auto; float:left;">
+        <div id = "sixers-div", style = "width:800 px; height: 600px; margin: auto; float:left; padding-left:20px;">
             <div id = "sixers-plot" style = "width: 800px; height: 600px; margin: auto; float: left;">
             </div>
         </div>
-        <!--Warriors Plot div--->
-        <div id = "warriors-div", style = "width:1100 px; height: 600px; margin: auto; float:left;">
-            <div id = "warriors-plot" style = "width: 800px; height: 600px; margin: auto; float: left;">
-            </div>
-            <div id = "warriors-side" style = "width: 300px; height: 600px; margin: auto; float: right;">
-              <div id = "warriors-button-div" style = "margin: auto; position: relative; top:50px; left: -50px;">
-                <button id="warriors-button" style = "font-size:16px; padding: 5px 2px;">Start!</button>
-
-                <p style = "font-size:125%"><b>Number Right of The Warriors</b> <br> <br>
-                  2014-15: <span id = "fourteen"></span> <br>
-                  2015-16: <span id = "fifteen"></span> <br>
-                  2016-17: <span id = "sixteen"></span> <br>
-                  2017-18: <span id = "seventeen"></span> <br>
-                  2018-19: <span id = "eighteen"></span>
-                </p>
-
-              </div>
-            </div>
-        </div>
 
 
-        <!--Makes all of the plots--->
+
+    <!--Makes all of the plots--->
 		<script type="text/javascript">
-            /* Main Plot */
-            // Variables for the main plot
-            var main_width = 1000
-            var main_height = 750
-            var padding = 50
-
-            // svg for the main plot
-            var svg = d3.select("#main-plot")
-                            .append("svg")
-                            .attr("width", main_width)
-                            .attr("height", main_height);
-
-            /* Time Lapse Plot */
-            // Variables for the time lapse plot
-            var time_width = 800
-            var time_height = 650
-
-            // svg for the time lapse plot
-            var time_svg = d3.select("#time-lapse-plot")
-                                .append("svg")
-                                .attr("width",time_width)
-                                .attr("height",time_height);
-
-            time_svg.append("text")
-                        .attr("x",70)
-                        .attr("y",85)
-                        .attr("font-size","24px")
-                        .attr("id","season-text")
-                        .text("Season:");
-
-            /* Three Plot */
-            var three_width = 700
-            var three_height = 550
-            var three_legend_svg_width = 100
-            var three_legend_svg_height = 550
-            var three_legend_width = 30
-            var three_legend_height = 500
-
-
-            var three_svg = d3.select("#three-plot")
-                                .append("svg")
-                                .attr("width",three_width)
-                                .attr("height",three_height);
-
-            var three_legend_svg = d3.select("#three-legend")
-                                        .append("svg")
-                                        .attr("width", three_legend_svg_width)
-                                        .attr("height", three_legend_svg_height);
-
-            /* Close Plot */
-            var close_width = 700
-            var close_height = 550
-            var close_legend_svg_width = 100
-            var close_legend_svg_height = 550
-            var close_legend_width = 30
-            var close_legend_height = 500
-
-            var close_svg = d3.select("#close-plot")
-                                .append("svg")
-                                .attr("width",close_width)
-                                .attr("height",close_height);
-
-            var close_legend_svg = d3.select("#close-legend")
-                                        .append("svg")
-                                        .attr("width", close_legend_svg_width)
-                                        .attr("height", close_legend_svg_height);
-
-
-            /* Efficiency Plot */
-            var eff_width = 700
-            var eff_height = 550
-            var eff_legend_svg_width = 100
-            var eff_legend_svg_height = 550
-            var eff_legend_width = 30
-            var eff_legend_height = 500
-
-            var eff_svg = d3.select("#eff-plot")
-                                .append("svg")
-                                .attr("width",close_width)
-                                .attr("height",close_height);
-
-            var eff_legend_svg = d3.select("#eff-legend")
-                                        .append("svg")
-                                        .attr("width", close_legend_svg_width)
-                                        .attr("height", close_legend_svg_height);
-
-
-
-
-            var buffer = .01
-
-            // d3 for the plots
             d3.csv("Data/Team_Shots_by_Zone.csv").then(function(data){
-                /* First the main plot */
-                // xscale
-                var xScale = d3.scaleLinear()
-                                .domain([d3.min(data, function(d){return parseFloat(d.pca_1);}) - buffer, d3.max(data, function(d){return parseFloat(d.pca_1);}) + buffer])
-                                .range([padding, main_width - padding]);
+              /* Main Plot */
+              // Variables for the main plot
+              var main_width = 950
+              var main_height = 750
+              var main_padding = 70
+              var padding = 50
 
-                // yscale
-                var yScale = d3.scaleLinear()
-                                .domain([d3.min(data, function(d){return parseFloat(d.pca_2);}) - buffer, d3.max(data, function(d){return parseFloat(d.pca_2);}) + buffer])
-                                .range([main_height - padding, padding]);
+              // svg for the main plot
+              var svg = d3.select("#main-plot")
+                              .append("svg")
+                              .attr("width", main_width)
+                              .attr("height", main_height);
 
-                // make axes
-                var xAxis = d3.axisBottom(xScale);
+              /* Time Lapse Plot */
+              // Variables for the time lapse plot
+              var time_width = 800
+              var time_height = 650
 
-                var yAxis = d3.axisLeft(yScale);
+              // svg for the time lapse plot
+              var time_svg = d3.select("#time-lapse-plot")
+                                  .append("svg")
+                                  .attr("width",time_width)
+                                  .attr("height",time_height);
+
+              time_svg.append("text")
+                          .attr("x",70)
+                          .attr("y",85)
+                          .attr("font-size","24px")
+                          .attr("id","season-text")
+                          .text("Season:");
+
+              /* Three Plot */
+              var three_width = 700
+              var three_height = 550
+              var three_legend_svg_width = 200
+              var three_legend_svg_height = 650
+              var three_legend_width = 25
+              var three_legend_height = 500
 
 
-                // This function draws the pca values for each team
-                var drawCircles = function(){
-                    var circles = svg.selectAll("circle")
-                                    .data(data)
-                                    .enter()
-                                    .append("circle");
+              var three_svg = d3.select("#three-plot")
+                                  .append("svg")
+                                  .attr("width",three_width)
+                                  .attr("height",three_height);
 
-                    circles.attr("cx", function(d){
-                                return xScale(parseFloat(d.pca_1));
-                            })
-                            .attr("cy", function(d){
-                                return yScale(parseFloat(d.pca_2));
-                            })
-                            .attr("r", 5)
-                            .attr("fill","black")
-                            .attr("stroke","black")
-                            .attr("stroke-width",2)
-                            .attr("id","pca")
-                            .attr("opacity",.8)
-                            .on("mouseover", function(d){
-                                    d3.select("#Team")
-                                        .style("color", "black")
-                                        .text(d.TEAM_NAME);
+              var three_legend_svg = d3.select("#three-legend")
+                                          .append("svg")
+                                          .attr("width", three_legend_svg_width)
+                                          .attr("height", three_legend_svg_height)
+                                          .style("position","relative")
+                                          .style("left",-120);
 
-                                    d3.select("#Season")
-                                        .style("color", "black")
-                                        .text(d.Season);
+              /* Close Plot */
+              var close_width = 700
+              var close_height = 550
+              var close_legend_svg_width = 200
+              var close_legend_svg_height = 650
+              var close_legend_width = 25
+              var close_legend_height = 500
 
-                                    d3.select("#paint")
-                                        .style("color", "black")
-                                        .text(function(){
-                                            var perc = parseFloat(d['CLOSE_PERC_OF_TOT'])
+              var close_svg = d3.select("#close-plot")
+                                  .append("svg")
+                                  .attr("width",close_width)
+                                  .attr("height",close_height);
 
-                                            perc = 100 * perc
+              var close_legend_svg = d3.select("#close-legend")
+                                          .append("svg")
+                                          .attr("width", close_legend_svg_width)
+                                          .attr("height", close_legend_svg_height)
+                                          .style("position","relative")
+                                          .style("left",-120);
 
-                                            perc = perc.toFixed(2).toString()
 
-                                            return perc.concat("%")
-                                        });
+              /* Efficiency Plot */
+              var eff_width = 700
+              var eff_height = 550
+              var eff_legend_svg_width = 200
+              var eff_legend_svg_height = 650
+              var eff_legend_width = 25
+              var eff_legend_height = 500
 
-                                    d3.select("#midrange")
-                                        .style("color", "black")
-                                        .text(function(){
-                                            var perc = parseFloat(d['MID_PERC_OF_TOT'])
+              var eff_svg = d3.select("#eff-plot")
+                                  .append("svg")
+                                  .attr("width",close_width)
+                                  .attr("height",close_height);
 
-                                            perc = 100 * perc
 
-                                            perc = perc.toFixed(2).toString()
+              var eff_legend_svg = d3.select("#eff-legend")
+                                          .append("svg")
+                                          .attr("width", eff_legend_svg_width)
+                                          .attr("height", eff_legend_svg_height)
+                                          .style("position","relative")
+                                          .style("left",-120);
 
-                                            return perc.concat("%")
-                                        });
 
-                                    d3.select("#three")
-                                        .style("color", "black")
-                                        .text(function(){
-                                            var perc = parseFloat(d['3_PERC_OF_TOT'])
 
-                                            perc = 100 * perc
 
-                                            perc = perc.toFixed(2).toString()
+              var buffer = .01
 
-                                            return perc.concat("%")
-                                        });
-                            })
-                            .on("mouseout", function(d){
-                                    d3.select("#Team")
-                                        .style("color", "white")
-                                        .text("");
 
-                                    d3.select("#Season")
-                                        .style("color","white")
-                                        .text("");
 
-                                    d3.select("#paint")
-                                        .style("color","white")
-                                        .text("");
+              /* First the main plot */
+              // xscale
+              var xScale = d3.scaleLinear()
+                              .domain([d3.min(data, function(d){return parseFloat(d.pca_1);}) - buffer, d3.max(data, function(d){return parseFloat(d.pca_1);}) + buffer])
+                              .range([main_padding, main_width - main_padding]);
 
-                                    d3.select("#midrange")
-                                        .style("color","white")
-                                        .text("");
+              // yscale
+              var yScale = d3.scaleLinear()
+                              .domain([d3.min(data, function(d){return parseFloat(d.pca_2);}) - buffer, d3.max(data, function(d){return parseFloat(d.pca_2);}) + buffer])
+                              .range([main_height - main_padding, main_padding]);
 
-                                    d3.select("#three")
-                                        .style("color","white")
-                                        .text("");
-                            });
-                }
+              // make axes
+              var xAxis = d3.axisBottom(xScale);
+
+              var yAxis = d3.axisLeft(yScale);
+
+
+              // This function draws the pca values for each team
+              var drawCircles = function(){
+                  var circles = svg.selectAll("circle")
+                                  .data(data)
+                                  .enter()
+                                  .append("circle");
+
+                  circles.attr("cx", function(d){
+                              return xScale(parseFloat(d.pca_1));
+                          })
+                          .attr("cy", function(d){
+                              return yScale(parseFloat(d.pca_2));
+                          })
+                          .attr("r", 5)
+                          .attr("fill","black")
+                          .attr("stroke","black")
+                          .attr("stroke-width",2)
+                          .attr("id","pca")
+                          .attr("opacity",.8)
+                          .on("mouseover", function(d){
+                                  d3.select("#Team")
+                                      .style("color", "black")
+                                      .text(d.TEAM_NAME);
+
+                                  d3.select("#Season")
+                                      .style("color", "black")
+                                      .text(d.Season);
+
+                                  d3.select("#paint")
+                                      .style("color", "black")
+                                      .text(function(){
+                                          var perc = parseFloat(d['CLOSE_PERC_OF_TOT'])
+
+                                          perc = 100 * perc
+
+                                          perc = perc.toFixed(2).toString()
+
+                                          return perc.concat("%")
+                                      });
+
+                                  d3.select("#midrange")
+                                      .style("color", "black")
+                                      .text(function(){
+                                          var perc = parseFloat(d['MID_PERC_OF_TOT'])
+
+                                          perc = 100 * perc
+
+                                          perc = perc.toFixed(2).toString()
+
+                                          return perc.concat("%")
+                                      });
+
+                                  d3.select("#three")
+                                      .style("color", "black")
+                                      .text(function(){
+                                          var perc = parseFloat(d['3_PERC_OF_TOT'])
+
+                                          perc = 100 * perc
+
+                                          perc = perc.toFixed(2).toString()
+
+                                          return perc.concat("%")
+                                      });
+                          })
+                          .on("mouseout", function(d){
+                                  d3.select("#Team")
+                                      .style("color", "white")
+                                      .text("");
+
+                                  d3.select("#Season")
+                                      .style("color","white")
+                                      .text("");
+
+                                  d3.select("#paint")
+                                      .style("color","white")
+                                      .text("");
+
+                                  d3.select("#midrange")
+                                      .style("color","white")
+                                      .text("");
+
+                                  d3.select("#three")
+                                      .style("color","white")
+                                      .text("");
+                          });
+              }
 
                 // This function updates the circles when we slect season/team
                 var updateCircles = function(){
@@ -438,12 +1122,44 @@
 
                 // append the axes to the plot
                 svg.append("g")
-                    .attr("transform", "translate(0, " + (main_height - padding) +")")
+                    .style("font-size",16)
+                    .attr("transform", "translate(0, " + (main_height - main_padding) +")")
                     .call(xAxis);
 
                 svg.append("g")
-                    .attr("transform", "translate(" + padding + ",0)")
+                    .style("font-size",16)
+                    .attr("transform", "translate(" + main_padding  + ",0)")
                     .call(yAxis);
+
+                svg.append("text")
+                    .attr("transform",
+                          "translate(" + (main_width/2) + " ," +
+                          (main_height - 20) + ")")
+                    .style("text-anchor", "middle")
+                    .attr("font-size",24)
+                    .text("First PCA Value");
+
+                svg.append("text")
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", -7)
+                    .attr("x",0 - (main_height / 2))
+                    .attr("dy", "1em")
+                    .attr("font-size",24)
+                    .style("text-anchor", "middle")
+                    .text("Second PCA Value");
+
+                svg.append("text")
+                    .attr("x", main_padding + 10)
+                    .attr("y", main_padding + 10)
+                    .attr("font-size",18)
+                    .text("Hover over a dot to");
+
+                svg.append("text")
+                    .attr("x", main_padding + 10)
+                    .attr("y", main_padding + 30)
+                    .attr("font-size",18)
+                    .text("highlight the team it represents");
+
 
                 // draw the circles onto the svg
                 drawCircles();
@@ -479,6 +1195,23 @@
                     .attr("transform", "translate(" + padding + ",0)")
                     .call(time_yAxis);
 
+                time_svg.append("text")
+                        .attr("transform",
+                              "translate(" + (time_width/2) + " ," +
+                              (time_height - 10) + ")")
+                        .style("text-anchor", "middle")
+                        .attr("font-size",18)
+                        .text("First PCA Value");
+
+                time_svg.append("text")
+                        .attr("transform", "rotate(-90)")
+                        .attr("y", 0-5)
+                        .attr("x",0 - (time_height / 2))
+                        .attr("dy", "1em")
+                        .attr("font-size",18)
+                        .style("text-anchor", "middle")
+                        .text("Second PCA Value");
+
                 // This function runs through the season sequence
                 var seasonSequence = function(){
                     var circles = time_svg.selectAll("circle")
@@ -501,16 +1234,28 @@
 
                    var seasonsLength = seasons.length;
 
-                   for (var i = 0; i < seasonsLength; i++) {
-                       var delay = 1500;
-                       var dur = 200;
+                   time_svg.select("#season-text")
+                             .transition("text")
+                             .delay(0)
+                             .duration(0)
+                             .text("Season:");
 
-                       time_svg.selectAll("#season-text")
+                   time_svg.selectAll("circle")
+                             .transition("circles")
+                             .delay(0)
+                             .duration(0)
+                             .attr("opacity",0);
+
+                   for (var i = 0; i < seasonsLength; i++) {
+                      var delay = 1000;
+                      var dur = 300;
+
+                      time_svg.selectAll("#season-text")
                                 .transition("text")
                                 .delay(delay*i)
                                 .text("Season: " + seasons[i]);
 
-                       time_svg.selectAll("circle")
+                      time_svg.selectAll("circle")
                                     .data(data)
                                     .filter(function(d){return d.Season != seasons[i];})
                                     .transition("circles")
@@ -518,7 +1263,7 @@
                                     .attr("opacity",.01)
                                     .duration(dur);
 
-                       time_svg.selectAll("circle")
+                      time_svg.selectAll("circle")
                                     .data(data)
                                     .filter(function(d){return d.Season === seasons[i];})
                                     .transition("circles")
@@ -526,6 +1271,20 @@
                                     .duration(dur)
                                     .attr("opacity",.9);
                     }
+
+                    time_svg.select("#season-text")
+                              .transition("text")
+                              .delay(delay*(seasonsLength) + 500)
+                              .text("2000-01 VS. 2018-19");
+
+                    time_svg.selectAll("circle")
+                            .data(data)
+                            .filter(function(d){return d.Season === "2000-01";})
+                            .transition("circles")
+                            .delay(delay*seasonsLength + 500)
+                            .duration(dur)
+                            .attr("opacity",.9);
+
                 }
 
                 // this adds the on click function to the time-lapse button
@@ -586,6 +1345,40 @@
                     .attr("transform", "translate(" + padding + ",0)")
                     .call(close_yAxis);
 
+                close_svg.append("text")
+                        .attr("transform",
+                              "translate(" + (close_width/2) + " ," +
+                              (close_height - 10) + ")")
+                        .style("text-anchor", "middle")
+                        .attr("font-size",18)
+                        .text("First PCA Value");
+
+                close_svg.append("text")
+                        .attr("transform", "rotate(-90)")
+                        .attr("y", 0-5)
+                        .attr("x",0 - (close_height / 2))
+                        .attr("dy", "1em")
+                        .attr("font-size",18)
+                        .style("text-anchor", "middle")
+                        .text("Second PCA Value");
+
+                three_svg.append("text")
+                        .attr("transform",
+                              "translate(" + (close_width/2) + " ," +
+                              (close_height - 10) + ")")
+                        .style("text-anchor", "middle")
+                        .attr("font-size",18)
+                        .text("First PCA Value");
+
+                three_svg.append("text")
+                        .attr("transform", "rotate(-90)")
+                        .attr("y", 0-5)
+                        .attr("x",0 - (close_height / 2))
+                        .attr("dy", "1em")
+                        .attr("font-size",18)
+                        .style("text-anchor", "middle")
+                        .text("Second PCA Value");
+
 
                 /* Efficiency Plot */
                 var effPlot= function(){
@@ -623,17 +1416,37 @@
                                             .enter()
                                             .append("circle");
 
+                    eff_svg.append("text")
+                            .attr("transform",
+                                  "translate(" + (eff_width/2) + " ," +
+                                  (eff_height - 10) + ")")
+                            .style("text-anchor", "middle")
+                            .attr("font-size",18)
+                            .text("First PCA Value");
+
+                    eff_svg.append("text")
+                            .attr("transform", "rotate(-90)")
+                            .attr("y", 0-5)
+                            .attr("x",0 - (eff_height / 2))
+                            .attr("dy", "1em")
+                            .attr("font-size",18)
+                            .style("text-anchor", "middle")
+                            .text("Second PCA Value");
+
+
+
+
                     circles.attr("cx", function(d){
                                 return three_xScale(parseFloat(d.pca_1));
                             })
                             .attr("cy", function(d){
                                 return three_yScale(parseFloat(d.pca_2));
                             })
-                            .attr("r", 5)
+                            .attr("r", 8)
                             .attr("fill",function(d){return color(parseFloat(d['Restricted_Area-Center(C)_PERC_TOT']) + parseFloat(d['3_PERC_OF_TOT']));})
                             .attr("stroke","black")
-                            .attr("stroke-width",1)
-                            .attr("opacity",.9);
+                            .attr("stroke-width",2)
+                            .attr("opacity",.95);
                 }
 
                 var effLegend = function(){
@@ -661,6 +1474,24 @@
                     .attr("transform", "translate(" + eff_legend_width + ",0)")
                     .call(yAxis);
 
+                    eff_legend_svg.append("text")
+                            .attr("transform","rotate(-90)")
+                            .attr("y", eff_legend_width + 34)
+                            .attr("x", 0 - (eff_height/2))
+                            .attr("dy", "1em")
+                            .attr("font-size",18)
+                            .style("text-anchor", "middle")
+                            .text("Percentage of Shots from");
+
+                    eff_legend_svg.append("text")
+                            .attr("transform","rotate(-90)")
+                            .attr("y", eff_legend_width + 54)
+                            .attr("x", 0 - (eff_height/2))
+                            .attr("dy", "1em")
+                            .attr("font-size",18)
+                            .style("text-anchor", "middle")
+                            .text("Three or Restricted Area");
+
 
                 }
 
@@ -680,15 +1511,15 @@
                             .attr("cy", function(d){
                                 return three_yScale(parseFloat(d.pca_2));
                             })
-                            .attr("r", 5)
+                            .attr("r", 8)
                             .attr("fill",function(d){return color(d[court_area]);})
                             .attr("stroke","black")
-                            .attr("stroke-width",1)
-                            .attr("opacity",.9);
+                            .attr("stroke-width",2)
+                            .attr("opacity",.95);
 
                 }
 
-                var addLegend = function(svg, court_area, height, width){
+                var addLegend = function(svg, court_area, height, width, label){
                     var colorScale = d3.scaleSequential(d3.interpolateInferno)
                                         .domain([0, height])
 
@@ -713,15 +1544,24 @@
                     .attr("transform", "translate(" + width + ",0)")
                     .call(yAxis);
 
+                    svg.append("text")
+                        .attr("transform","rotate(-90)")
+                        .attr("y", width + 34)
+                        .attr("x", 0 - (height/2))
+                        .attr("dy", "1em")
+                        .attr("font-size",18)
+                        .style("text-anchor", "middle")
+                        .text(label);
+
 
                 }
 
                 percPlot(three_svg, "3_PERC_OF_TOT")
-                addLegend(three_legend_svg, "3_PERC_OF_TOT", three_legend_height, three_legend_width)
+                addLegend(three_legend_svg, "3_PERC_OF_TOT", three_legend_height, three_legend_width, "Percentage of Shots from 3")
 
 
                 percPlot(close_svg, "Restricted_Area-Center(C)_PERC_TOT")
-                addLegend(close_legend_svg, "Restricted_Area-Center(C)_PERC_TOT", close_legend_height, close_legend_width)
+                addLegend(close_legend_svg, "Restricted_Area-Center(C)_PERC_TOT", close_legend_height, close_legend_width, "Percentage of Shots from Restricted Area")
 
                 effPlot()
                 effLegend()
@@ -731,6 +1571,8 @@
 
             });
 
+            /* This plot looks at specific changes
+            in Houston's PCA over time */
             d3.csv("Data/Houston.csv").then(function(data){
                 var seasons = d3.map(data, function(d){return d.Season;}).keys();
                 var width = 800;
@@ -738,6 +1580,7 @@
                 var padding = 75;
                 var buffer = .02;
 
+                // When Harden Was traded to the Rockets
                 var harden0 = data.find(item => item.Season === "2011-12")
                 var harden1 = data.find(item => item.Season === "2012-13")
 
@@ -746,6 +1589,7 @@
 
                 var hardenHyp = hyp(harden_pca1_diff,harden_pca2_diff);
 
+                // When they hired Dantoni
                 var dantoni0 = data.find(item => item.Season === "2015-16")
                 var dantoni1 = data.find(item => item.Season === "2016-17")
 
@@ -754,7 +1598,7 @@
 
                 var dantoniHyp = hyp(dantoni_pca1_diff,dantoni_pca2_diff);
 
-
+                // Make the svg
                 var svg = d3.select("#rockets-plot")
                             .append("svg")
                             .attr("width", width)
@@ -782,7 +1626,7 @@
 
 
 
-
+                // Add in the line between 2011-12 and 2012-13
                 var hardenLine = svg.append("line")
                                         .attr("x1",function() { return xScale(parseFloat(harden0.pca_1)); })
                                         .attr("y1",function() { return yScale(parseFloat(harden0.pca_2)); })
@@ -792,6 +1636,7 @@
                                         .style("stroke-width",3)
                                         .attr("opacity",0);
 
+                // for the transition
                 var hardenText = svg.append("text")
                                         .attr("font-size",20)
                                         .attr("fill","white")
@@ -799,6 +1644,7 @@
                                         .attr("y",-50)
                                         .text("James Harden is traded to the Rockets");
 
+                // add in the line for dantoni's hiring
                 var dantoniLine = svg.append("line")
                                         .attr("x1",function() { return xScale(parseFloat(dantoni0.pca_1)); })
                                         .attr("y1",function() { return yScale(parseFloat(dantoni0.pca_2)); })
@@ -808,6 +1654,7 @@
                                         .style("stroke-width",3)
                                         .attr("opacity",0);
 
+                // for the transition
                 var dantoniText = svg.append("text")
                                         .attr("font-size",20)
                                         .attr("fill","white")
@@ -816,7 +1663,7 @@
                                         .text("Mike D'Antoni is hired");
 
 
-
+                // add the circles
                 var circles = svg.selectAll("circle")
                     .data(data)
                     .enter()
@@ -834,7 +1681,7 @@
                     .text(function(d) { return d.Season; });
 
 
-
+                // start the transition when we mouseover the plot
                 function mouseover() {
                     svg.selectAll("circle")
                             .data(data)
@@ -919,7 +1766,11 @@
                                 .attr("x1",function() { return xScale(parseFloat(dantoni0.pca_1)); })
                                 .attr("y1",function() { return yScale(parseFloat(dantoni0.pca_2)); })
                                 .attr("x2",function() { return xScale(parseFloat(dantoni1.pca_1)); })
-                                .attr("y2",function() { return yScale(parseFloat(dantoni1.pca_2)); });
+                                .attr("y2",function() { return yScale(parseFloat(dantoni1.pca_2)); })
+                                .transition("dantoniLine")
+                                .delay(3200)
+                                .duration(500)
+                                .attr("opacity",0);
 
                     dantoniText.transition("dantoniText")
                                 .delay(12000)
@@ -940,23 +1791,19 @@
                     hardenLine.transition("hardenLine")
                             .delay(17000)
                             .duration(500)
-                            .attr("opacity",1);
+                            .attr("opacity",1)
+                            .transition("hardenLine")
+                            .duration(500)
+                            .delay(2000)
+                            .attr("opacity",0);
 
 
                 }
 
+                // halt the transition and return to defaults on mouseout
                 function mouseout() {
                     svg.selectAll("circle")
                         .interrupt("circles");
-
-                    /*svg.selectAll("circle")
-                        .interrupt("circle2");
-
-                    svg.selectAll("circle")
-                        .interrupt("circle");
-
-                    svg.selectAll("circle")
-                        .interrupt("circle");*/
 
                     hardenText.interrupt("hardenText");
 
@@ -1033,6 +1880,7 @@
 
             });
 
+            /* Bucks plot, looks at specific events over time */
             d3.csv("Data/Bucks.csv").then(function(data){
                 var width = 800;
                 var height = 600;
@@ -1768,7 +2616,8 @@
                                 .attr("opacity",0)
                                 .filter(function(d){return d.TEAM_NAME === "Golden State Warriors";})
                                 .attr("fill","#FFC72C")
-                                .attr("stroke","#1D428A");
+                                .attr("stroke","#1D428A")
+                                .attr("id","GSW");
 
                             svg.append("text")
                                 .attr("font-size","20")
@@ -1826,7 +2675,7 @@
                         .transition("gsw")
                         .delay(5000)
                         .duration(500)
-                        .attr("opacity",.5);
+                        .attr("opacity",.3);
 
                     svg.selectAll("circle")
                         .data(data)
@@ -1890,7 +2739,7 @@
                         .transition("gsw")
                         .delay(4000)
                         .duration(500)
-                        .attr("opacity",.5);
+                        .attr("opacity",.3);
 
                     svg.selectAll("circle")
                         .data(data)
@@ -1916,7 +2765,7 @@
                         .transition("gsw")
                         .delay(3600)
                         .duration(800)
-                        .attr("opacity",.5);
+                        .attr("opacity",.3);
 
                     svg.selectAll("circle")
                         .data(data)
@@ -1942,7 +2791,7 @@
                         .transition("gsw")
                         .delay(4000)
                         .duration(800)
-                        .attr("opacity",.5);
+                        .attr("opacity",.3);
 
                     svg.selectAll("circle")
                         .data(data)
