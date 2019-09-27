@@ -76,7 +76,7 @@
           </p>
 
           <p>
-            Ever since the advent of Moreyball there's been a deluge of takes on
+            Ever since the advent of Moreyball there's been a steady flow of takes on
             the shift towards the three heavy offense. Now, the point of this post is
             not to be the Kent Brockman of threes - I for one welcome our new
             three point overlords! - nor wax poetic about behemoths methodically
@@ -93,7 +93,7 @@
             The NBA began accurately tracking the x,y position of every shot taken
             during a game back in the 2000-01 regular season. Using the python package
             <a href = "https://github.com/swar/nba_api">nba_api</a> this data can
-            be collected to be analyzed. Every single post up, fade-away jumper,
+            be collected and analyzed. Every single post up, fade-away jumper,
             or step-back three taken occurs in one of 15 sections of a court,
             outlined below.
           </p>
@@ -267,8 +267,8 @@
     <p>
       Enter Principal Components Analysis (PCA). PCA takes high dimensional data sets
       and reduces them to a more manageable number of dimensions. For example, PCA can
-      take these 15 percentages and boil them down to just 1 or 2 numbers \< insert
-      super script here to link to how PCA works\>. Running the 2018-19 Toronto Raptors'
+      take these 15 percentages and boil them down to just 1 or 2 numbers (<a href = "http://setosa.io/ev/principal-component-analysis/">
+      Click to go to a link explaining PCA</a>). Running the 2018-19 Toronto Raptors'
       shot distribution through PCA produces the following two values: (0.093,-0.030).
       Doing this for every team's shot distribution from the 2000-01 to the 2018-19
       seaons produces the following plot, where a team's first PCA value is on the
@@ -579,7 +579,7 @@
       In the first principal component vector the negative court areas are those
       that have been deemed "less efficient", the mid-range, while the most positive
       court areas are downtown and in the restricted area. So a team's first
-      principal component value captures how much often that team took less efficient
+      principal component value captures how often that team took less efficient
       shots. In terms of the earlier plot, more efficient teams step to the right
       less efficient teams to the left please.
     </p>
@@ -602,7 +602,7 @@
     </div>
 
     <p>
-      The second PCA value captures how a team distributes a shot in those
+      The second PCA value captures how a team distributes shots in those
       more efficient zones. Three point zones are the most negative in the second
       principal component vector, while the restricted area is overwhelmingly the
       most positive. Teams that live under the rim will be found near the top of
@@ -647,7 +647,7 @@
       only places where the expected points per shot is above 1. It is pretty straight
       forward, 23 shots from spots with expected points per shot above 1 should
       net more than 23 points, 23 shots from spots with expected points per shot
-      below 1 should net you less than 23 points. As a reminder, the team with
+      below 1 should net less than 23 points. As a reminder, the team with
       more points typically wins the game.
     </p>
 
@@ -678,13 +678,22 @@
       the chart (where the threes and restricted areas roam), as expected.
     </p>
 
+    <h2>
+      Team Ramblings
+    </h2>
+
+    <p>
+      Beyond the NBA wide season to season transitions these PCA coordinates can
+      be used to examine the shot distributions of particular teams. What follows
+      are four vignettes on individual team PCA transitions.
+    </p>
+
     <h3>
       If it Ain't Broke Don't Fix it
     </h3>
 
     <p>
-      Is this the all is lost moment for mid-range and post play? Maybe, but maybe
-      not. The Warriors have the most prolific shooting duo in history,
+      The Warriors have the most prolific shooting duo in history,
       <a href = "https://www.youtube.com/watch?v=JTA5aBmmYJg">Steph</a> and
       <a href = "https://www.youtube.com/watch?v=uRE1X_DXDp0">Klay</a>, so it's
       a no brainer that they take advantage of this more efficient approach, right?
@@ -714,20 +723,27 @@
     </div>
 
     <p>
-      The Warriors start off their dynasty run ahead of the crowd when it comes to
-      shot distribution. In their record breaking 2015-16 Season they placed their shots
-      more "efficiently" than all but two teams in the league, with over 35% of their shots
-      coming from 3 (second to only the Houston Rockets). However, they then became
-      stagnant. For the seasons following 2016 they essentially stand still while
-      the rest of the association move further and further to the right. GSW ended
-      the 2018-19 season as the team with the second highest of shots from mid-range
-      (second only to the 3 detesting <a href = "https://www.youtube.com/watch?v=JR5c4ZinP9M">Spurs</a>).
+      One refrain throughout the 2018-19 season explaining the Warriors struggles
+      (if a fifth straight finals birth can be called that) was that
+      <a href = "https://www.wsj.com/articles/the-end-of-the-golden-state-warriors-era-of-invicibility-11560517376">
+      the rest of the NBA got better</a>. Did it, or did it just get smarter?
     </p>
 
     <p>
-      But the Warriors went 3 for 5 in the NBA finals, and probably 4 for 5 if either
-      of Klay or KD don't get hurt (sorry Raptors fans, but its true). So
-      does shot distribution relative to the rest of the league even matter? If
+      The Warriors started their dynasty run near the front of the herd, when it came to
+      shot distribution. In their record breaking 2015-16 season they placed their shots
+      more "efficiently" than all but two teams in the league, with over 35% of their shots
+      coming from 3 (second to only the Houston Rockets). Then they got stagnant.
+      After the 2015-16 season they watched the rest of the association pass them by,
+       GSW ended the 2018-19 season as the team
+      with the second highest percent of shots from mid-range (second only to the 3
+      detesting <a href = "https://www.youtube.com/watch?v=JR5c4ZinP9M">Spurs</a>).
+    </p>
+
+    <p>
+      But the Warriors went 3 for 5 in the NBA finals, and probably would have gone
+      4 for 5 if either of Klay or KD don't get hurt (sorry Raptors fans, but its true).
+      So does shot distribution relative to the rest of the league even matter? If
       a team features 4 future hall of famers, probably not so much, especially when
       2 (possibly <a href = "https://www.youtube.com/watch?v=YVsah5EBKuI">3</a>) are
       hall of famers because of their ability to make efficient shots. Klay and Curry
@@ -736,22 +752,17 @@
     </p>
 
     <p>
-      It actually might now be broke though. Heading into the 2019-20 season the
-      Warriors will have to replace Kevin Durant and Klay Thompson with D'Angelo
-      Russell. While D'Angelo is a rising star, it is insanity to think Steve Kerr
-      could just slot him into the same offensive scheme and expect similar results.
-      It seems likely they will make a shift toward the right of the PCA chart.
+      For the second half of this decade the Warriors more or less ran back the same
+      shot distribution season after season, to historic success. If it ain't broke
+      don't fix it. The thing is, it might actually be broke. Heading into the
+      2019-20 season the Warriors will have to replace Kevin Durant and Klay Thompson
+      (temporarily at least) with D'Angelo Russell. While D'Angelo is a rising star,
+      it is insanity to think Steve Kerr could just slot him into the same offensive
+      scheme and expect similar results. It seems likely they will make a shift toward
+      the right of the PCA chart.
     </p>
 
-    <h2>
-      Taking the Leap
-    </h2>
 
-    <p>
-      Not only do these PCA coordinates capture the NBA wide transition in NBA,
-      but they can help describe the effect of particular moves a team makes between
-      seasons.
-    </p>
 
     <h3>
       Houston We Have a Harden
@@ -763,7 +774,7 @@
       been deemed Moreyball the PCA plot reveals that it was not Daryl that led
       this transition. Morey has been GM of the Rockets since 2007, but Houston
       did not significantly change its shot distribution until a few years later.
-      Hover over the below plot to see what team events do coincide with noticeable
+      Click the below plot to see what team events do coincide with noticeable
       changes in shot distribution.
     </p>
 
@@ -775,7 +786,7 @@
 
     <p>
       Maybe a better name would be Hardenball? Now it could be argued that Daryl
-      discovered the competitive advantage that 3 > 2 and thus trading for a player
+      discovered the competitive advantage that 3 > 2, traded for a player
       that is perfect for such an offense, and then hired a coach that would take
       that offense to the extreme. But, it is equally likely that Morey just traded
       for a good player that was (stupidly) available, and then built an offensive
@@ -785,28 +796,148 @@
     </p>
 
     <h3>
-      The Bucks Start With Giannis
+      The Process Was About More Than Tanking
     </h3>
 
+    <p>
+      In 2013 NBA analytics martyr Sam Hinkie (and current head coach Brett Brown)
+      was hired by the 76ers to begin their process. While the "The Process" has
+      become synonymous with years of losing to accrue future assets, it also
+      signified a major shift in the Sixers' shot allocation. Again, click the
+      plot below to observe.
+    </p>
 
-
-        <!--Bucks Plot div--->
-        <div id = "bucks-div", style = "width:800 px; height: 600px; margin: auto; float:left; padding-left:20px;">
-            <div id = "bucks-plot" style = "width: 800px; height: 600px; margin: auto; float: left;">
-            </div>
+    <!--76ers Plot div-->
+    <div id = "sixers-div", style = "width:1300 px; height: 600px; margin: auto; float:left; padding-left:20px;">
+        <div id = "sixers-plot" style = "width: 1300px; height: 600px; margin: auto; float: left;">
         </div>
+    </div>
 
-        <!--Nets Plot div--->
-        <div id = "nets-div", style = "width:800 px; height: 600px; margin: auto; float:left; padding-left:20px;">
-            <div id = "nets-plot" style = "width: 800px; height: 600px; margin: auto; float: left;">
-            </div>
-        </div>
+    <p>
+      In that inaugural process season, Philadelphia had one of the most "efficient"
+      shot distributions in the whole NBA. Not only that, their jump from 2012-13 to
+      2013-14 represents one of the largest season to season shifts on the PCA plot.
+      However, similar to the
+      Warriors, they stopped moving forward. This could be due to their consistent personnel
+      decisions, opting to draft <a href = "https://www.youtube.com/watch?v=DkqGMNhSOWU">players
+      that can't shoot</a>, or it could be the one constant the team has shared every
+      season since The Process began, Coach Brett Brown.
+    </p>
 
-        <!--76ers Plot div-->
-        <div id = "sixers-div", style = "width:800 px; height: 600px; margin: auto; float:left; padding-left:20px;">
-            <div id = "sixers-plot" style = "width: 800px; height: 600px; margin: auto; float: left;">
-            </div>
+    <p>
+      It will be interesting to see how the Sixers' shot distribution develops
+      this upcoming season. They lost their best gunner to the Pelicans this offseason,
+      but Simmons has allegedly been working on his jumper all Summer. The 2019-20
+      season could provide further evidence that shot distribution is a characteristic
+      of the coach, if it stays in the familiar Philadelphia spot.
+    </p>
+
+    <h3>
+      LeBron Who?
+    </h3>
+
+    <p>
+      When LeBron declared he was 'Coming Home' in the summer of 2014, the
+      Cleveland Cavaliers became the perennial Eastern Conference representative in
+      the NBA finals. The return of the King did not merely alter the title odds for
+      his home town team, it also signified a shift in their shot distribution.
+    </p>
+
+    <p>
+      However, when LBJ left for purpler pastures he did not take the Cavaliers'
+      shot distribution with him. Click the plot below.
+    </p>
+
+    <!--Cavs Plot div--->
+    <div id = "cavs-div", style = "width:1300 px; height: 600px; margin: auto; float:left; padding-left:20px;">
+        <div id = "cavs-plot" style = "width: 1300px; height: 600px; margin: auto; float: left;">
         </div>
+    </div>
+
+    <p>
+      Despite losing the star of Space Jam 2, Cleveland placed its attmepts in a
+      near identical manner. This seems somewhat odd, since much of the Cavaliers'
+      offense was predicated on LeBron, particularly in the 2017-18 run. It can't
+      really be chalked up to roster consistency, the Cavaliers roster was somewhat of
+      a revolving door in the 2018-19 season as the team attempted to address a deluge
+      of injuries as well as clean up their cap situation moving forward.
+      It could be argued that this is a remnant of the coaching staff that was in
+      place during LeBron's second stint, but the Cavaliers notably lost head coach
+      Tyron Lue. Perhaps interim coach Larry Drew was the offensive mastermind this
+      entire time.
+    </p>
+
+    <p>
+      Whatever the reason, it wouldn't be surprising to see a massive departure
+      from their current PCA cluster this coming season. With an entirely new
+      coaching staff, and an influx of freshly drafted talent, the Cavaliers will
+      probably see change in 2019.
+    </p>
+
+    <h3>
+      Kenny Atkinson Was a Nets Gain
+    </h3>
+
+    <p>
+      Three years after one of the worst trades in NBA history, the Nets brought
+      in Kenny Atkinson to help right the ship. While it took Atkinson 3 seasons
+      at the helm to bring a season with a winning record (42-40, so just barely),
+      what he immediately brought was a new shot distribution strategy. Click
+      the plot below.
+    </p>
+
+    <!--Nets Plot div--->
+    <div id = "nets-div", style = "width:1300 px; height: 600px; margin: auto; float:left; padding-left:20px;">
+        <div id = "nets-plot" style = "width: 1300px; height: 600px; margin: auto; float: left;">
+        </div>
+    </div>
+
+    <p>
+      Throughout Atkinson's tenure the Nets have been one of the furthest right
+      teams on the PCA chart. Typically they trailed only Houston, and in 2018-19
+      they were one of four teams to shoot over 90% of their shots from outside
+      the midrange. Atkinson has leaned into Moreyball hard, but not to much success.
+      This coming season will be interesting as it marks Atkinson's first season
+      with etablished all stars. How will he integrate Kyrie Irving and Deandre
+      Jordan into this system?
+    </p>
+
+    <h2>
+      What PCA Has to Say
+    </h2>
+
+    <p>
+      These PCA coordinates have allowed an examination of the macro shot distribution
+      trends of the NBA as well as the micro trends that season to season team
+      decisions produce. The two numbers provide a novel way of analyzing team shot
+      distributions beyond the 3, mid-range, and paint shot percentages. While those
+      percentages will always be important, the procedure presented above is a nice
+      supplement to the standard analyses.
+    </p>
+
+    <p>
+      For one, when the shot distribution percentages are run through the PCA algorithm
+      there is no prior knowledge or bias that suggests the importance of the 3 point line
+      befor the algorithm is run. PCA picked up on this trend ignorant of the basketball
+      talking heads. PCA allows the data to tell us the important regions of the court.
+    </p>
+
+    <p>
+      This feature will be important going forward. The 2018-19 season highlighted how much
+      teams are finally buying into the efficiency of their shot distributions. Much like on base
+      percentage in baseball, the fact that 3 > 2 is no longer a competive advantage.
+      In hindsight the shift from long 2s to 3s was obvious, but when the three point
+      line was introduced nobody took it seriously. People will likely not see the next
+      innovation coming, if they did teams would already be doing it. PCA could help
+      identify the next trend as its happening rather than the 6 or so years it took
+      for everyone to catch up with Houston. PCA could be a canary in the shot distribution
+      coal mine.
+    </p>
+
+
+
+
+
 
 
 
@@ -1603,8 +1734,7 @@
                             .append("svg")
                             .attr("width", width)
                             .attr("height",height)
-                            .on("mouseover",mouseover)
-                            .on("mouseout",mouseout);
+                            .on("click",animate);
 
 
                 // Make x scale
@@ -1680,15 +1810,74 @@
                     .append("svg:title")
                     .text(function(d) { return d.Season; });
 
+                // halt the transition and return to defaults on mouseout
+                function stopAnimation() {
+                    svg.selectAll("circle")
+                        .interrupt("circles");
+
+                    hardenText.interrupt("hardenText");
+
+                    hardenLine.interrupt("hardenLine");
+
+                    dantoniText.interrupt("dantoniText");
+
+                    dantoniLine.interrupt("dantoniLine");
+
+
+                    svg.selectAll("circle")
+                            .transition("1")
+                            .duration(10)
+                            .attr("opacity",1);
+
+                    hardenLine.transition("2")
+                                .attr("opacity",0);
+
+                    hardenLine.transition("3")
+                                .delay(10)
+                                .attr("x1", function(){return xScale(parseFloat(harden0.pca_1));})
+                                .attr("y1", function(){return yScale(parseFloat(harden0.pca_2));})
+                                .attr("x2", function(){return xScale(parseFloat(harden1.pca_1));})
+                                .attr("y2", function(){return yScale(parseFloat(harden1.pca_2));});
+
+
+
+
+
+                    dantoniLine.transition("4")
+                                .attr("opacity",0);
+
+                    dantoniLine.transition("5")
+                                .delay(10)
+                                .attr("x1", function(){return xScale(parseFloat(dantoni0.pca_1));})
+                                .attr("y1", function(){return yScale(parseFloat(dantoni0.pca_2));})
+                                .attr("x2", function(){return xScale(parseFloat(dantoni1.pca_1));})
+                                .attr("y2", function(){return yScale(parseFloat(dantoni1.pca_2));});
+
+                    hardenText.transition("6")
+                                .attr("fill","white")
+                                .transition("8")
+                                .delay(10)
+                                .attr("x",-50)
+                                .attr("y",-50);
+
+                    dantoniText.transition("7")
+                                .attr("fill","white")
+                                .transition("9")
+                                .delay(10)
+                                .attr("x",-50)
+                                .attr("y",-60);
+                }
 
                 // start the transition when we mouseover the plot
-                function mouseover() {
+                function animate() {
+                    stopAnimation()
                     svg.selectAll("circle")
                             .data(data)
                             .filter(function(d){return (d.Season != "2011-12") &&
                                                         (d.Season != "2012-13");})
                             .transition("circles")
-                            .duration(500)
+                            .delay(20)
+                            .duration(200)
                             .attr("opacity",.05)
 
 
@@ -1800,63 +1989,7 @@
 
                 }
 
-                // halt the transition and return to defaults on mouseout
-                function mouseout() {
-                    svg.selectAll("circle")
-                        .interrupt("circles");
 
-                    hardenText.interrupt("hardenText");
-
-                    hardenLine.interrupt("hardenLine");
-
-                    dantoniText.interrupt("dantoniText");
-
-                    dantoniLine.interrupt("dantoniLine");
-
-
-                    svg.selectAll("circle")
-                            .transition("1")
-                            .duration(500)
-                            .attr("opacity",1);
-
-                    hardenLine.transition("2")
-                                .attr("opacity",0);
-
-                    hardenLine.transition("3")
-                                .delay(500)
-                                .attr("x1", function(){return xScale(parseFloat(harden0.pca_1));})
-                                .attr("y1", function(){return yScale(parseFloat(harden0.pca_2));})
-                                .attr("x2", function(){return xScale(parseFloat(harden1.pca_1));})
-                                .attr("y2", function(){return yScale(parseFloat(harden1.pca_2));});
-
-
-
-
-
-                    dantoniLine.transition("4")
-                                .attr("opacity",0);
-
-                    dantoniLine.transition("5")
-                                .delay(500)
-                                .attr("x1", function(){return xScale(parseFloat(dantoni0.pca_1));})
-                                .attr("y1", function(){return yScale(parseFloat(dantoni0.pca_2));})
-                                .attr("x2", function(){return xScale(parseFloat(dantoni1.pca_1));})
-                                .attr("y2", function(){return yScale(parseFloat(dantoni1.pca_2));});
-
-                    hardenText.transition("6")
-                                .attr("fill","white")
-                                .transition("8")
-                                .delay(100)
-                                .attr("x",-50)
-                                .attr("y",-50);
-
-                    dantoniText.transition("7")
-                                .attr("fill","white")
-                                .transition("9")
-                                .delay(100)
-                                .attr("x",-50)
-                                .attr("y",-60);
-                }
 
 
 
@@ -1880,36 +2013,20 @@
 
             });
 
-            /* Bucks plot, looks at specific events over time */
-            d3.csv("Data/Bucks.csv").then(function(data){
+            /* Cavs plot, looks at specific events over time */
+            d3.csv("Data/cavs.csv").then(function(data){
                 var width = 800;
                 var height = 600;
                 var padding = 75;
                 var buffer = .02;
 
-                var allStar0 = data.find(item => item.Season === "2015-16");
-                var allStar1 = data.find(item => item.Season === "2016-17");
-
-                var allStar_pca1_diff = parseFloat(allStar0.pca_1) - parseFloat(allStar1.pca_1);
-                var allStar_pca2_diff = parseFloat(allStar0.pca_2) - parseFloat(allStar1.pca_2);
-
-                var allStarHyp = hyp(allStar_pca1_diff,allStar_pca2_diff);
-
-                var Bud0 = data.find(item => item.Season === "2017-18");
-                var Bud1 = data.find(item => item.Season === "2018-19");
-
-                var Bud_pca1_diff = parseFloat(Bud0.pca_1) - parseFloat(Bud1.pca_1);
-                var Bud_pca2_diff = parseFloat(Bud0.pca_2) - parseFloat(Bud1.pca_2);
-
-                var BudHyp = hyp(Bud_pca1_diff,Bud_pca2_diff);
 
 
-                var svg = d3.select("#bucks-plot")
+                var svg = d3.select("#cavs-plot")
                             .append("svg")
                             .attr("width", width)
                             .attr("height",height)
-                            .on("mouseover",mouseover)
-                            .on("mouseout",mouseout);
+                            .on("click",animate);
 
 
 
@@ -1929,24 +2046,10 @@
                 // Make y axis
                 var yAxis = d3.axisLeft(yScale);
 
-                var allStarLine = svg.append("line")
-                                        .attr("x1",function() { return xScale(parseFloat(allStar0.pca_1)); })
-                                        .attr("y1",function() { return yScale(parseFloat(allStar0.pca_2)); })
-                                        .attr("x2",function() { return xScale(parseFloat(allStar1.pca_1)); })
-                                        .attr("y2",function() { return yScale(parseFloat(allStar1.pca_2)); })
-                                        .style("stroke","black")
-                                        .style("stroke-width",3)
-                                        .attr("opacity",0);
 
 
-                var BudLine = svg.append("line")
-                                        .attr("x1",function() { return xScale(parseFloat(Bud0.pca_1)); })
-                                        .attr("y1",function() { return yScale(parseFloat(Bud0.pca_2)); })
-                                        .attr("x2",function() { return xScale(parseFloat(Bud1.pca_1)); })
-                                        .attr("y2",function() { return yScale(parseFloat(Bud1.pca_2)); })
-                                        .style("stroke","black")
-                                        .style("stroke-width",3)
-                                        .attr("opacity",0);
+
+
 
 
                 svg.selectAll("circle")
@@ -1956,8 +2059,8 @@
                     .attr("cx",function(d){return xScale(parseFloat(d.pca_1));})
                     .attr("cy",function(d){return yScale(parseFloat(d.pca_2));})
                     .attr("r",6)
-                    .attr("fill","#EEE1C6")
-                    .attr("stroke","#00471B")
+                    .attr("fill","#FFB81C")
+                    .attr("stroke","#6F263D")
                     .attr("stroke-width",4)
                     .attr("opacity",1)
                     .append("svg:title")
@@ -1977,209 +2080,123 @@
                     .attr("transform", "translate(" + padding + ",0)")
                     .call(yAxis);
 
-
-
-                var allStarText = svg.append("text")
-                                        .attr("font-size",20)
-                                        .attr("fill","white")
-                                        .attr("x", -50)
-                                        .attr("y",-50)
-                                        .text("Giannis's first All Star season");
-
-
-                var BudText = svg.append("text")
-                                        .attr("font-size",20)
-                                        .attr("fill","white")
-                                        .attr("x", -50)
-                                        .attr("y",-50)
-                                        .text("Jason Kidd is replaced with Mike Budenholzer");
-
-                function mouseover(){
-                  svg.selectAll("circle")
-                        .data(data)
-                        .filter(function(d){return (d.Season != "2015-16") &&
-                                                    (d.Season != "2016-17");})
-                        .transition("circles")
-                        .duration(500)
-                        .attr("opacity",.05);
-
-                  svg.selectAll("circle")
-                        .data(data)
-                        .filter(function(d){return (d.Season === "2015-16") ||
-                                                    (d.Season === "2016-17");})
-                        .transition("circles")
-                        .delay(8500)
-                        .duration(500)
-                        .attr("opacity",.05);
-
-                  svg.selectAll("circle")
-                        .data(data)
-                        .filter(function(d){return (d.Season === "2017-18") ||
-                                                    (d.Season === "2018-19");})
-                        .transition("circles")
-                        .delay(8500)
-                        .duration(500)
-                        .attr("opacity",1);
+                var text = svg.append("text")
+                              .attr("x",padding + 12)
+                              .attr("y",padding + 15)
+                              .attr("font-size",20)
+                              .text("");
 
 
 
-
-                  allStarLine.transition("allStarLine")
-                              .delay(200)
-                              .attr("opacity",1);
-
-                  allStarLine.transition("allStarLine")
-                              .delay(600)
-                              .duration(1000)
-                              .attr("x2", function(){return xScale(parseFloat(allStar0.pca_1) + allStarHyp);})
-                              .attr("y2", function(){return yScale(parseFloat(allStar0.pca_2));})
-                              .transition("allStarLine")
-                              .delay(800)
-                              .duration(1000)
-                              .attr("y1", function(){return yScale(parseFloat(allStar0.pca_2))+200;})
-                              .attr("y2", function(){return yScale(parseFloat(allStar0.pca_2))+200;})
-                              .transition("allStarLine")
-                              .delay(3400)
-                              .duration(1000)
-                              .attr("x1",function() { return xScale(parseFloat(allStar0.pca_1)); })
-                              .attr("y1",function() { return yScale(parseFloat(allStar0.pca_2)); })
-                              .attr("x2",function() { return xScale(parseFloat(allStar1.pca_1)); })
-                              .attr("y2",function() { return yScale(parseFloat(allStar1.pca_2)); })
-                              .transition("allStarLine")
-                              .delay(650)
-                              .duration(500)
-                              .attr("opacity",.05)
-                              .transition("allStarLine")
-                              .delay(7000)
-                              .duration(500)
-                              .attr("opacity",1)
-                              .transition("allStarLine")
-                              .delay(2700)
-                              .duration(500)
-                              .attr("opacity",0);
-
-                  allStarText.transition("allStarText")
-                              .delay(3000)
-                              .attr("x", function(){return xScale(parseFloat(allStar0.pca_1));})
-                              .attr("y", function(){return yScale(parseFloat(allStar0.pca_2))+190;})
-                              .transition("allStarText")
-                              .attr("fill","black")
-                              .transition("allStarText")
-                              .delay(3500)
-                              .duration(0)
-                              .attr("fill","white")
-                              .attr("x",-50)
-                              .attr("y",-50);
-
-
-                  BudLine.transition("BudLine")
-                              .delay(8500)
-                              .duration(500)
-                              .attr("opacity",1)
-                              .transition("BudLine")
-                              .delay(800)
-                              .duration(1000)
-                              .attr("y1", function(){return yScale(parseFloat(Bud0.pca_2))+80;})
-                              .attr("y2", function(){return yScale(parseFloat(Bud0.pca_2))+80;})
-                              .transition("BudLine")
-                              .delay(3400)
-                              .duration(1000)
-                              .attr("x1",function() { return xScale(parseFloat(Bud0.pca_1)); })
-                              .attr("y1",function() { return yScale(parseFloat(Bud0.pca_2)); })
-                              .attr("x2",function() { return xScale(parseFloat(Bud1.pca_1)); })
-                              .attr("y2",function() { return yScale(parseFloat(Bud1.pca_2)); })
-                              .transition("BudLine")
-                              .delay(4000)
-                              .duration(500)
-                              .attr("opacity",0);
-
-                  BudText.transition("BudText")
-                              .delay(10200)
-                              .attr("x", function(){return xScale(parseFloat(Bud0.pca_1)) - 100;})
-                              .attr("y", function(){return yScale(parseFloat(Bud0.pca_2))+70;})
-                              .transition("BudText")
-                              .attr("fill","black")
-                              .transition("BudText")
-                              .delay(3500)
-                              .duration(0)
-                              .attr("fill","white")
-                              .attr("x",-50)
-                              .attr("y",-50);
-
-                  svg.selectAll("circle")
-                        .transition("circles")
-                        .delay(16000)
-                        .duration(500)
-                        .attr("opacity",1);
-
-
-                }
-
-                function mouseout(){
+                function stopAnimate(){
                   svg.selectAll("circle")
                       .interrupt("circles");
 
-                  allStarText.interrupt("allStarText");
+                  text.interrupt("text");
 
-                  allStarLine.interrupt("allStarLine");
-
-                  BudText.interrupt("BudText");
-
-                  BudLine.interrupt("BudLine");
-
+                  text.transition("text")
+                      .delay(10)
+                      .duration(0)
+                      .text("");
 
                   svg.selectAll("circle")
-                          .transition("1")
-                          .duration(0)
-                          .attr("opacity",1);
-
-                  allStarLine.transition("2")
-                              .duration(0)
-                              .attr("opacity",0);
-
-                  allStarLine.transition("3")
-                              .duration(0)
-                              .attr("x1", function(){return xScale(parseFloat(allStar0.pca_1));})
-                              .attr("y1", function(){return yScale(parseFloat(allStar0.pca_2));})
-                              .attr("x2", function(){return xScale(parseFloat(allStar1.pca_1));})
-                              .attr("y2", function(){return yScale(parseFloat(allStar1.pca_2));});
-
-
-
-
-
-                  BudLine.transition("4")
-                              .duration(0)
-                              .attr("opacity",0);
-
-                  BudLine.transition("5")
-                              .delay(0)
-                              .attr("x1", function(){return xScale(parseFloat(Bud0.pca_1));})
-                              .attr("y1", function(){return yScale(parseFloat(Bud0.pca_2));})
-                              .attr("x2", function(){return xScale(parseFloat(Bud1.pca_1));})
-                              .attr("y2", function(){return yScale(parseFloat(Bud1.pca_2));});
-
-                  allStarText.transition("6")
-                              .duration(0)
-                              .attr("fill","white")
-                              .transition("8")
-                              .duration(0)
-                              .delay(100)
-                              .attr("x",-50)
-                              .attr("y",-50);
-
-                  BudText.transition("7")
-                              .attr("fill","white")
-                              .transition("9")
-                              .duration(0)
-                              .delay(100)
-                              .attr("x",-50)
-                              .attr("y",-60);
+                      .transition("circle")
+                      .delay(10)
+                      .duration(100)
+                      .attr("r",6)
+                      .attr("stroke-width",4)
+                      .attr("opacity",1);
                 }
+
+                function animate(){
+                  stopAnimate()
+
+                  svg.selectAll("circle")
+                      .data(data)
+                      .filter(function(d){return d.Season != "2014-15" &&
+                                                  d.Season != "2015-16" &&
+                                                  d.Season != "2016-17" &&
+                                                  d.Season != "2017-18" &&
+                                                  d.Season != "2018-19";})
+                      .transition("circle")
+                      .delay(20)
+                      .duration(600)
+                      .attr("opacity",.2);
+
+                  svg.selectAll("circle")
+                      .data(data)
+                      .filter(function(d){return d.Season === "2014-15" ||
+                                                  d.Season === "2015-16" ||
+                                                  d.Season === "2016-17" ||
+                                                  d.Season === "2017-18" ||
+                                                  d.Season === "2018-19";})
+                      .transition("circle")
+                      .delay(20)
+                      .duration(600)
+                      .attr("r",8)
+                      .attr("stroke-width",5);
+
+                  svg.selectAll("circle")
+                      .data(data)
+                      .filter(function(d){return d.Season === "2014-15";})
+                      .transition("circle")
+                      .delay(1300)
+                      .duration(400)
+                      .attr("r",18)
+                      .attr("stroke-width",10.8)
+                      .transition("circle")
+                      .delay(1400)
+                      .duration(400)
+                      .attr("r",10)
+                      .attr("stroke-width",6);
+
+                  svg.selectAll("circle")
+                      .data(data)
+                      .filter(function(d){return d.Season === "2018-19";})
+                      .transition("circle")
+                      .delay(3100)
+                      .duration(400)
+                      .attr("r",18)
+                      .attr("stroke-width",10.8)
+                      .transition("circle")
+                      .delay(1400)
+                      .duration(400)
+                      .attr("r",10)
+                      .attr("stroke-width",6);
+
+                  text.transition("text")
+                      .delay(400)
+                      .duration(0)
+                      .text("The 2014-2019 Seasons")
+                      .transition("text")
+                      .delay(1200)
+                      .duration(0)
+                      .text("LeBron Comes Home to Cleveland")
+                      .transition("text")
+                      .delay(1750)
+                      .duration(0)
+                      .text("LeBron goes to LA")
+                      .transition("text")
+                      .delay(1650)
+                      .duration(0)
+                      .text("");
+
+                  svg.selectAll("circle")
+                      .transition("circle")
+                      .delay(5000)
+                      .duration(600)
+                      .attr("r",6)
+                      .attr("stroke-width",4)
+                      .attr("opacity",1);
+
+                }
+
+
 
 
             });
 
+            /* Nets Plot */
             d3.csv("Data/Nets.csv").then(function(data){
                 var width = 800;
                 var height = 600;
@@ -2199,8 +2216,7 @@
                             .append("svg")
                             .attr("width", width)
                             .attr("height",height)
-                            .on("mouseover",mouseover)
-                            .on("mouseout",mouseout);
+                            .on("click",animate);
 
 
 
@@ -2267,12 +2283,15 @@
                     .call(yAxis);
 
 
-                function mouseover() {
+                function animate() {
+                    stopAnimate()
+
                     svg.selectAll("circle")
                             .data(data)
                             .filter(function(d){return (d.Season != "2015-16") &&
                                                         (d.Season != "2016-17");})
                             .transition("circles")
+                            .delay(20)
                             .duration(500)
                             .attr("opacity",.05)
                             .transition("circles")
@@ -2322,7 +2341,7 @@
 
                 }
 
-                function mouseout() {
+                function stopAnimate() {
                     svg.selectAll("circle")
                         .interrupt("circles");
 
@@ -2333,14 +2352,16 @@
 
                     svg.selectAll("circle")
                             .transition("1")
+                            .delay(0)
                             .duration(500)
                             .attr("opacity",1);
 
                     netsLine.transition("2")
+                                .delay(0)
                                 .attr("opacity",0);
 
                     netsLine.transition("3")
-                                .delay(500)
+                                .delay(0)
                                 .attr("x1", function(){return xScale(parseFloat(nets0.pca_1));})
                                 .attr("y1", function(){return yScale(parseFloat(nets0.pca_2));})
                                 .attr("x2", function(){return xScale(parseFloat(nets1.pca_1));})
@@ -2349,7 +2370,7 @@
                     netsText.transition("6")
                                 .attr("fill","white")
                                 .transition("8")
-                                .delay(100)
+                                .delay(0)
                                 .attr("x",-50)
                                 .attr("y",-50);
                 }
@@ -2357,6 +2378,7 @@
 
             });
 
+            /* Sixers Plot */
             d3.csv("Data/sixers.csv").then(function(data){
               var width = 800;
               var height = 600;
@@ -2376,8 +2398,7 @@
                           .append("svg")
                           .attr("width", width)
                           .attr("height",height)
-                          .on("mouseover",mouseover)
-                          .on("mouseout",mouseout);
+                          .on("click",animate);
 
 
 
@@ -2412,7 +2433,7 @@
                                       .attr("fill","white")
                                       .attr("x", -50)
                                       .attr("y",-50)
-                                      .text("Sam Presti becomes GM");
+                                      .text("The Process begins, Brett Brown is hired");
 
 
 
@@ -2445,12 +2466,14 @@
                   .call(yAxis);
 
 
-                  function mouseover() {
+                  function animate() {
+                      stopAnimate()
                       svg.selectAll("circle")
                               .data(data)
                               .filter(function(d){return (d.Season != "2012-13") &&
                                                           (d.Season != "2013-14");})
                               .transition("circles")
+                              .delay(10)
                               .duration(500)
                               .attr("opacity",.05)
                               .transition("circles")
@@ -2500,7 +2523,7 @@
 
                   }
 
-                  function mouseout() {
+                  function stopAnimate() {
                       svg.selectAll("circle")
                           .interrupt("circles");
 
@@ -2511,14 +2534,16 @@
 
                       svg.selectAll("circle")
                               .transition("1")
+                              .delay(0)
                               .duration(500)
                               .attr("opacity",1);
 
                       sixersLine.transition("2")
+                                  .delay(0)
                                   .attr("opacity",0);
 
                       sixersLine.transition("3")
-                                  .delay(500)
+                                  .delay(0)
                                   .attr("x1", function(){return xScale(parseFloat(sixers0.pca_1));})
                                   .attr("y1", function(){return yScale(parseFloat(sixers0.pca_2));})
                                   .attr("x2", function(){return xScale(parseFloat(sixers1.pca_1));})
@@ -2527,7 +2552,7 @@
                       sixersText.transition("6")
                                   .attr("fill","white")
                                   .transition("8")
-                                  .delay(100)
+                                  .delay(0)
                                   .attr("x",-50)
                                   .attr("y",-50);
                   }
@@ -2670,10 +2695,11 @@
                         .filter(function(d){return d.Season === "2014-15" &
                                             d.TEAM_NAME === "Golden State Warriors";})
                         .transition("gsw")
+                        .delay(50)
                         .duration(500)
                         .attr("opacity",1)
                         .transition("gsw")
-                        .delay(5000)
+                        .delay(5200)
                         .duration(500)
                         .attr("opacity",.3);
 
@@ -2682,7 +2708,7 @@
                         .filter(function(d){return d.Season === "2014-15" &&
                                                 d.TEAM_NAME != "Golden State Warriors";})
                         .transition("ngsw")
-                        .delay(2000)
+                        .delay(2200)
                         .duration(500)
                         .attr("opacity",1)
                         .transition("ngsw")
@@ -2696,36 +2722,36 @@
                             .duration(500)
                             .text("The Golden State Warriors Win the Title in 2014-15.")
                             .transition("note")
-                            .delay(1600)
+                            .delay(1800)
                             .duration(0)
                             .text("The rest of the NBA in 2014-15.")
                             .transition("note")
-                            .delay(3500)
+                            .delay(3600)
                             .duration(0)
                             .text("The Warriors lose to the Cavs in 2015-16.")
                             .transition("note")
-                            .delay(2000)
+                            .delay(2200)
                             .text("The rest of the NBA in 2015-16")
                             .transition("note")
-                            .delay(2500)
+                            .delay(2700)
                             .text("Durant goes to the Warriors, they win in 2016-17")
                             .transition("note")
-                            .delay(2000)
+                            .delay(2500)
                             .text("The rest of the NBA in 2016-17")
                             .transition("note")
-                            .delay(2500)
+                            .delay(2450)
                             .text("Warriors repeat in 2017-18")
                             .transition("note")
-                            .delay(2000)
+                            .delay(2100)
                             .text("The rest of the NBA in 2017-18")
                             .transition("note")
-                            .delay(3000)
+                            .delay(3200)
                             .text("The Warriors lose to Toronto in 2018-19")
                             .transition("note")
-                            .delay(2000)
+                            .delay(2300)
                             .text("The rest of the NBA in 2018-19")
                             .transition("note")
-                            .delay(3000)
+                            .delay(3100)
                             .text("");
 
                    svg.selectAll("circle")
@@ -2733,11 +2759,11 @@
                         .filter(function(d){return d.Season === "2015-16" &&
                                                 d.TEAM_NAME === "Golden State Warriors";})
                         .transition("gsw")
-                        .delay(5500)
+                        .delay(5700)
                         .duration(500)
                         .attr("opacity",1)
                         .transition("gsw")
-                        .delay(4000)
+                        .delay(4220)
                         .duration(500)
                         .attr("opacity",.3);
 
@@ -2746,11 +2772,11 @@
                         .filter(function(d){return d.Season === "2015-16" &&
                                                 d.TEAM_NAME != "Golden State Warriors";})
                         .transition("ngsw")
-                        .delay(7500)
+                        .delay(8000)
                         .duration(500)
                         .attr("opacity",1)
                         .transition("ngsw")
-                        .delay(2000)
+                        .delay(2100)
                         .duration(500)
                         .attr("opacity",0);
 
@@ -2759,33 +2785,7 @@
                         .filter(function(d){return d.Season === "2016-17" &&
                                                 d.TEAM_NAME === "Golden State Warriors";})
                         .transition("gsw")
-                        .delay(10000)
-                        .duration(800)
-                        .attr("opacity",1)
-                        .transition("gsw")
-                        .delay(3600)
-                        .duration(800)
-                        .attr("opacity",.3);
-
-                    svg.selectAll("circle")
-                        .data(data)
-                        .filter(function(d){return d.Season === "2016-17" &&
-                                                    d.TEAM_NAME != "Golden State Warriors";})
-                        .transition("ngsw")
-                        .delay(12000)
-                        .duration(800)
-                        .attr("opacity",1)
-                        .transition("ngsw")
-                        .delay(1500)
-                        .duration(800)
-                        .attr("opacity",0);
-
-                    svg.selectAll("circle")
-                        .data(data)
-                        .filter(function(d){return d.Season === "2017-18" &&
-                                                    d.TEAM_NAME === "Golden State Warriors";})
-                        .transition("gsw")
-                        .delay(14500)
+                        .delay(10600)
                         .duration(800)
                         .attr("opacity",1)
                         .transition("gsw")
@@ -2795,14 +2795,40 @@
 
                     svg.selectAll("circle")
                         .data(data)
-                        .filter(function(d){return d.Season === "2017-18" &&
+                        .filter(function(d){return d.Season === "2016-17" &&
                                                     d.TEAM_NAME != "Golden State Warriors";})
                         .transition("ngsw")
-                        .delay(16500)
+                        .delay(13000)
                         .duration(800)
                         .attr("opacity",1)
                         .transition("ngsw")
-                        .delay(2000)
+                        .delay(1400)
+                        .duration(800)
+                        .attr("opacity",0);
+
+                    svg.selectAll("circle")
+                        .data(data)
+                        .filter(function(d){return d.Season === "2017-18" &&
+                                                    d.TEAM_NAME === "Golden State Warriors";})
+                        .transition("gsw")
+                        .delay(15600)
+                        .duration(800)
+                        .attr("opacity",1)
+                        .transition("gsw")
+                        .delay(4600)
+                        .duration(800)
+                        .attr("opacity",.3);
+
+                    svg.selectAll("circle")
+                        .data(data)
+                        .filter(function(d){return d.Season === "2017-18" &&
+                                                    d.TEAM_NAME != "Golden State Warriors";})
+                        .transition("ngsw")
+                        .delay(17600)
+                        .duration(800)
+                        .attr("opacity",1)
+                        .transition("ngsw")
+                        .delay(2600)
                         .duration(800)
                         .attr("opacity",0);
 
@@ -2811,7 +2837,7 @@
                         .filter(function(d){return d.Season === "2018-19" &&
                                                     d.TEAM_NAME === "Golden State Warriors";})
                         .transition("gsw")
-                        .delay(19500)
+                        .delay(20900)
                         .duration(800)
                         .attr("opacity",1);
 
@@ -2820,11 +2846,11 @@
                         .filter(function(d){return d.Season === "2018-19" &&
                                                     d.TEAM_NAME != "Golden State Warriors";})
                         .transition("ngsw")
-                        .delay(21500)
+                        .delay(23200)
                         .duration(800)
                         .attr("opacity",1)
                         .transition("ngsw")
-                        .delay(2000)
+                        .delay(3000)
                         .duration(800)
                         .attr("opacity",0);
 
@@ -2832,7 +2858,7 @@
                         .data(data)
                         .filter(function(d){return d.TEAM_NAME === "Golden State Warriors";})
                         .transition("gsw")
-                        .delay(25000)
+                        .delay(28000)
                         .duration(1000)
                         .attr("opacity",1);
 
@@ -2840,7 +2866,7 @@
                         .data(data)
                         .filter(function(d){return d.TEAM_NAME != "Golden State Warriors";})
                         .transition("ngsw")
-                        .delay(28000)
+                        .delay(32000)
                         .duration(1000)
                         .attr("opacity",1);
 
@@ -2848,28 +2874,28 @@
 
                       d3.select("#fourteen")
                           .transition("num_teams")
-                          .delay(2300)
+                          .delay(2400)
                           .text(data[0].NumTeams);
 
 
                       d3.select("#fifteen")
                           .transition("num_teams")
-                          .delay(7800)
+                          .delay(8100)
                           .text(data[1].NumTeams);
 
                       d3.select("#sixteen")
                           .transition("num_teams")
-                          .delay(12300)
+                          .delay(13100)
                           .text(data[2].NumTeams);
 
                     d3.select("#seventeen")
                           .transition("num_teams")
-                          .delay(16900)
+                          .delay(17800)
                           .text(data[3].NumTeams);
 
                     d3.select("#eighteen")
                           .transition("num_teams")
-                          .delay(21900)
+                          .delay(23300)
                           .text(data[4].NumTeams);
 
 
