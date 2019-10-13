@@ -581,19 +581,23 @@
       When it comes to the plot above, this means that teams with a larger percentage
       of their shots from the mid-range will be on the left (the negative side) of the chart,
       while teams shooting more from deep and in the restricted area will be on the right
-      side (the positive side). These are precisely the regions of the court that have
-      been endlessly discussed as being more or less efficient. The first principal component
-      value is negative for the "less efficient" teams that shoot from mid-range, while
-      the first principal component value is positive for the "more efficient" teams
-      that shoot from three and under the rim. In terms of the earlier plot, more
-      efficient teams step to the right, less efficient teams to the left please.
+      side (the positive side).
+    </p>
+    <p>
+      This particular grouping of court regions has been a hot topic in the discussion
+      of shot efficiency. In recent years it has been discovered that mid-range shots
+      are "less efficient" than their close and long-range counterparts. Thus the first
+      principal component value is negative for those "less efficient" teams that shoot
+      more from mid-range, while the first principal component value is positive for
+      "more efficient" teams that tend to shoot from three and under the rim. In
+      terms of the earlier plot, more efficient teams step to the right, less
+      efficient teams to the left please.
     </p>
 
     <p>
-      Below is a plot that demonstrates what was explained above. Coloring each dot
-      by the team's percentage of total shots taken from three or the
-      restricted area paints a clear picture. Going from left to right on the PCA
-      plot increases the percentage of total attempts from downtown or under the
+      Coloring each dot by the team's percentage of total shots taken from three or the
+      restricted area paints this picture. Going from left to right on the PCA
+      plot below increases the percentage of total attempts from downtown or under the
       basket. A team's first PCA value captures the "efficiency" of their shot
       selection.
     </p>
@@ -2393,7 +2397,7 @@
                 var nets0 = data.find(item => item.Season === "2015-16");
                 var nets1 = data.find(item => item.Season === "2016-17");
 
-                
+
 
 
                 var svg = d3.select("#nets-plot")
