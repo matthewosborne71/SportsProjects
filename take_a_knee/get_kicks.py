@@ -24,7 +24,7 @@ def kick_team_and_yard(yard):
         yard_line = 100 - int(yard.split(" ")[1])
     else:
         team = "error"
-        yard_line = -99
+        yard_line = np.nan
     return team, yard_line
 
 ## two helper functions for grabbing team abbreviations
@@ -166,7 +166,7 @@ def returned_to(item, return_team):
         else:
             return 100 - int(item.split(" ")[1])
     else:
-        return -99
+        return np.nan
 
 # This function will take in the kicks df and produce a dictionary
 # that breaks down each kick from that game
@@ -256,7 +256,7 @@ def get_game_dict(kicks,team_1,team_2,tb_y):
                 else:
                     game_dict['returned_to'].append(int(t_and_y[1]) - int(kick_info[0]) + int(kick_info[5]))
             else:
-                if returned_to(kicks.loc[i+1,'position'],return_team) == -99:
+                if np.isnan(returned_to(kicks.loc[i+1,'position'],return_team)):
                     game_dict['returned_to'].append(returned_to(kicks.loc[i+2,'position'],return_team))
                 else:
                     game_dict['returned_to'].append(returned_to(kicks.loc[i+1,'position'],return_team))
@@ -267,7 +267,7 @@ def get_game_dict(kicks,team_1,team_2,tb_y):
 ##### Script ##############################
 
 # The seasons we want
-seasons = range(2005,2020,1)
+seasons = range(2018,2020,1)
 
 for year in seasons:
     # Get the team abbreviations for that season
