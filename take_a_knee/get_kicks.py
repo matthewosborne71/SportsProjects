@@ -251,7 +251,11 @@ def get_game_dict(kicks,team_1,team_2,tb_y):
                 game_dict['returned_to'].append(100)
             # Was it the last play of a half?
             elif (kicks.last_play[i]):
-                if "None" != kick_info[5]:
+                if np.isnan(kick_info[0]):
+                    game_dict['returned_to'].append(np.nan)
+                elif np.isnan(t_and_y[1]):
+                    game_dict['returned_to'].append(np.nan)
+                elif "None" != kick_info[5]:
                     game_dict['returned_to'].append(int(t_and_y[1]) - int(kick_info[0]))
                 else:
                     game_dict['returned_to'].append(int(t_and_y[1]) - int(kick_info[0]) + int(kick_info[5]))
@@ -267,7 +271,7 @@ def get_game_dict(kicks,team_1,team_2,tb_y):
 ##### Script ##############################
 
 # The seasons we want
-seasons = range(2018,2020,1)
+seasons = range(2012,2019,1)
 
 for year in seasons:
     # Get the team abbreviations for that season
