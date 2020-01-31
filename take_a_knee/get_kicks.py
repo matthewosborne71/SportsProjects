@@ -36,29 +36,6 @@ def clean_name(name):
     name = name.replace("+","")
     return name
 
-# this function takes in a season and returns a
-# team abbreviation dictionary
-def make_team_abbr_dict(year):
-    # Read in the year page and make soup
-    url = urlopen("https://www.pro-football-reference.com/years/" + str(year) + "/")
-    soup = BeautifulSoup(url,"html.parser")
-
-    # make the dict
-    team_names = dict()
-
-    # for the NFC
-    for th in soup.find(id = "NFC").find_all("th"):
-        if (th['data-stat'] == "team") & (th['scope'] == "row"):
-            team_names[clean_name(th.text)] = clean_team_name(th.a['href']).upper()
-
-
-    # for the AFC
-    for th in soup.find(id = "AFC").find_all("th"):
-        if (th['data-stat'] == "team") & (th['scope'] == "row"):
-            team_names[clean_name(th.text)] = clean_team_name(th.a['href']).upper()
-
-    return team_names
-
 # this produces a dataframe containing the kickoffs and following plays
 # given the profootball focus url for the game
 def get_kicks(site,touchback_search,touchback_yard):
@@ -78,6 +55,20 @@ def get_kicks(site,touchback_search,touchback_yard):
 
     # make the table parsable
     pbp_table = BeautifulSoup(comments[pbp],"html.parser")
+
+    team_1 = "Empty"
+    team_2 = "Empty"
+
+    for tr in pbp_table.find_all("tr"):
+        if team_1 == "Empty":
+            if tr.find('td',{'data-stat':'location'}):
+                team_1 = tr.find('td',{'data-stat':'location'}).text.split(" ")[0]
+        elif team_2 == "Empty":
+            if tr.find('td',{'data-stat':'location'}):
+                if team_1 != tr.find('td',{'data-stat':'location'}).text.split(" ")[0]:
+                    team_2 = tr.find('td',{'data-stat':'location'}).text.split(" ")[0]
+        else:
+            break
 
     # Now we make a df to hold all the plays from the game
     plays = {'quarter':[],'time_left':[],'position':[],'description':[]}
@@ -128,7 +119,7 @@ def get_kicks(site,touchback_search,touchback_yard):
                 kicks.loc[i,'last_play'] = True
 
 
-    return kicks,touchback_search,touchback_yard
+    return team_1,team_2,kicks,touchback_search,touchback_yard
 
 # This function reads in a kick description and finds
 # how far the kick was, if it resulted in a touchback,
@@ -174,7 +165,7 @@ def returned_to(item, return_team):
 # that breaks down each kick from that game
 # This function will take in the kicks df and produce a dictionary
 # that breaks down each kick from that game
-def get_game_dict(kicks,team_1,team_2,tb_y):
+def get_game_dict(kicks,tb_y,team_1,team_2):
     # holder for this game's kick info
     game_dict = {"kick_team":[],"return_team":[],"kicked_from":[],"kick_length":[],
                      "returned_to":[],"touchback":[],"penalty":[],"turnover":[],"touchdown":[],"last_play":[]}
@@ -271,12 +262,9 @@ def get_game_dict(kicks,team_1,team_2,tb_y):
 ##### Script ##############################
 
 # The seasons we want
-seasons = range(2012,2019,1)
+seasons = range(2015,2020,1)
 
 for year in seasons:
-    # Get the team abbreviations for that season
-    teams = make_team_abbr_dict(year)
-
     # Get the soup for this particular season
     url = urlopen("https://www.pro-football-reference.com/years/" +
                     str(year) + "/games.htm")
@@ -299,15 +287,11 @@ for year in seasons:
                 # week of the game
                 season_dict['week'].append(tr.find("th",{"data-stat":"week_num"}).text)
 
-                # team_1 in the game
-                team_1 = teams[tr.find("td",{"data-stat":"winner"}).text]
-                # team_2 in the game
-                team_2 = teams[tr.find("td",{"data-stat":"loser"}).text]
                 # url for the game
                 game_url = "https://www.pro-football-reference.com" + tr.find("td",{"data-stat":"boxscore_word"}).a['href']
 
-                kicks,touchback_search,tb_y = get_kicks(game_url,touchback_search,tb_y)
-                season_dict['game_dicts'].append(get_game_dict(kicks,team_1,team_2,tb_y))
+                team_1,team_2,kicks,touchback_search,tb_y = get_kicks(game_url,touchback_search,tb_y)
+                season_dict['game_dicts'].append(get_game_dict(kicks,tb_y,team_1,team_2))
 
     all_games = []
     for i in range(len(season_dict['week'])):
