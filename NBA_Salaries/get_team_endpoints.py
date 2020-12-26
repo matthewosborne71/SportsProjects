@@ -1,4 +1,4 @@
-## get_cap_info.py
+## get_team_endpoints.py
 ## Written by: Matthew Osborne
 ## Date 12-20-20
 #################
